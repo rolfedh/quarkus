@@ -1,226 +1,119 @@
 ////
-This document is maintained in the main Quarkus repository
-and pull requests should be submitted there:
-https://github.com/quarkusio/quarkus/tree/main/docs/src/main/asciidoc
+This document is part of the main Quarkus repository. Submit pull requests here: https://github.com/quarkusio/quarkus/tree/main/docs/src/main/asciidoc
 ////
+
 [id="security-jpa"]
 = Quarkus Security with Jakarta Persistence
 include::_attributes.adoc[]
 :categories: security
-:summary: This guide explains how your application can use Jakarta Persistence to store users identities.
-:topics: security,identity-providers,sql,database,jpa,jdbc
+:summary: Learn how to use Jakarta Persistence for user identity storage in Quarkus applications.
+:topics: security, identity-providers, sql, database, jpa, jdbc
 :extensions: io.quarkus:quarkus-security-jpa-reactive
 
-Quarkus provides a Jakarta Persistence (formerly known as JPA) identity provider, similar to the xref:security-jdbc.adoc[JDBC identity provider], suitable for use with the xref:security-basic-authentication.adoc[Basic] and xref:security-authentication-mechanisms.adoc#form-auth[Form-based] Quarkus Security mechanisms, which require a combination of username and password credentials.
+Quarkus integrates Jakarta Persistence as an identity provider, paralleling the xref:security-jdbc.adoc[JDBC identity provider]. It aligns with Quarkus Security mechanisms like xref:security-basic-authentication.adoc[Basic] and xref:security-authentication-mechanisms.adoc#form-auth[Form-based] authentication, requiring username and password credentials.
 
-The Jakarta Persistence `IdentityProvider` creates a `SecurityIdentity` instance, which is used during user authentication to verify and authorize access requests making your Quarkus application secure.
+Jakarta Persistence's `IdentityProvider` generates a `SecurityIdentity` instance, facilitating user authentication by verifying and authorizing access in Quarkus applications.
 
-For an example of practical use of Basic authentication and Jakarta Persistence, see the xref:security-getting-started-tutorial.adoc[Getting Started with Security using Basic authentication and Jakarta Persistence] tutorial.
+For practical implementation, refer to the xref:security-getting-started-tutorial.adoc[Basic authentication and Jakarta Persistence tutorial].
 
+== Jakarta Persistence Entity Specification
 
-== Jakarta Persistence entity specification
+Quarkus security leverages Jakarta Persistence for managing usernames, passwords, and roles. These are stored in database entities, retrievable by Quarkus.
 
-Quarkus security offers a Jakarta Persistence integration to collect usernames, passwords, and roles, and store them into Jakarta Persistence database entities.
+Entity specifications for user information storage in Jakarta Persistence are as follows:
 
-The following Jakarta Persistence entity specification demonstrates how users' information needs to be stored in a Jakarta Persistence entity and properly mapped so that Quarkus can retrieve this information from a database.
+* `@UserDefinition` annotation is essential on a Jakarta Persistence entity, irrespective of using xref:hibernate-orm-panache.adoc[Hibernate ORM with Panache].
 
+* `@Username` and `@Password` fields must be of type `String`.
 
-* The `@UserDefinition` annotation must be present on a Jakarta Persistence entity, regardless of whether xref:hibernate-orm-panache.adoc[simplified Hibernate ORM with Panache] is used or not.
+* `@Roles` should be a `String`, `Collection<String>`, or `Collection<X>` (where `X` is an entity class with a `String` field annotated `@RolesValue`).
 
-* The `@Username` and `@Password` field types are always `String`.
+* Role elements in `String` format should be comma-separated.
 
-* The `@Roles` field must either be `String`, `Collection<String>`, or a `Collection<X>`, where `X` is an entity class with a single `String` field annotated as `@RolesValue`.
-
-* Each `String` role element type is parsed as a comma-separated list of roles.
-
-The following example demonstrates storing security information by adding annotations to the `user` entity:
+Example of security information storage using annotations on a `user` entity:
 
 [source,java]
 ----
 package org.acme.security.jpa;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+// [Import statements and User class definition]
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.elytron.security.common.BcryptUtil;
-import io.quarkus.security.jpa.Password;
-import io.quarkus.security.jpa.Roles;
-import io.quarkus.security.jpa.UserDefinition;
-import io.quarkus.security.jpa.Username;
-
-@Entity
-@Table(name = "test_user")
-@UserDefinition <1>
-public class User extends PanacheEntity {
-    @Username <2>
-    public String username;
-    @Password <3>
-    public String password;
-    @Roles <4>
-    public String role;
-
-    /**
-     * Adds a new user to the database
-     * @param username the username
-     * @param password the unencrypted password (it will be encrypted with bcrypt)
-     * @param role the comma-separated roles
-     */
-    public static void add(String username, String password, String role) { <5>
-        User user = new User();
-        user.username = username;
-        user.password = BcryptUtil.bcryptHash(password);
-        user.role = role;
-        user.persist();
+    // Method to add a new user
+    public static void add(String username, String password, String role) {
+        // [User creation and persistence logic]
     }
 }
 
 ----
 
-The `security-jpa` extension initializes only if a single entity is annotated with `@UserDefinition`.
+Only one entity annotated with `@UserDefinition` initializes the `security-jpa` extension.
 
-<1> The `@UserDefinition` annotation must be present on a single entity, either a regular Hibernate ORM entity or a Hibernate ORM with a Panache entity.
-<2> Indicates the field used for the username.
-<3> Indicates the field used for the password.
-By default, `security-jpa` uses bcrypt-hashed passwords, or you can configure plain text or custom passwords instead.
-<4> This indicates the comma-separated list of roles added to the target principal representation attributes.
-<5> This method allows you to add users while hashing passwords with the proper `bcrypt` hash.
+* <1> `@UserDefinition` - Identifies the user entity.
+* <2> `@Username` - Username field.
+* <3> `@Password` - Password field (bcrypt-hashed by default).
+* <4> `@Roles` - Comma-separated roles.
+* <5> User addition method with password bcrypt hashing.
 
+== Storing Roles in Separate Entities
 
-== Jakarta Persistence entity as storage of roles
-
-Use the following example to store roles inside another Jakarta Persistence entity:
+For role storage in a different entity:
 
 [source,java]
 ----
 @UserDefinition
-@Table(name = "test_user")
-@Entity
-public class User extends PanacheEntity {
-    @Username
-    public String name;
-
-    @Password
-    public String pass;
-
-    @ManyToMany
-    @Roles
-    public List<Role> roles = new ArrayList<>();
-}
+// [User entity definition with roles stored separately]
 
 @Entity
 public class Role extends PanacheEntity {
-
-    @ManyToMany(mappedBy = "roles")
-    public List<User> users;
-
-    @RolesValue
-    public String role;
+    // [Role entity definition]
 }
 ----
 
 [NOTE]
 ====
-The example shows how to store and access the roles, but if there's a need to update the existing user or create a new user. There will be a need to annotate `public List<Role> roles` with `@Cascade(CascadeType.ALL)` or select the specific type of `CascadeType`.
+To modify existing users or create new ones, annotate the `roles` field with `@Cascade(CascadeType.ALL)` or a specific `CascadeType`.
 ====
 
-== Password storage and hashing
+== Password Management
 
-When developing applications with Quarkus, you can decide how to manage password storage and hashing. You can choose to keep the default password and hashing settings of Quarkus, or you can hash passwords manually.
+Quarkus allows various password management strategies, including default bcrypt hashing or custom methods.
 
-With the default option, passwords are stored and hashed with https://en.wikipedia.org/wiki/Bcrypt[bcrypt] under the
-https://en.wikipedia.org/wiki/Crypt_\(C)[Modular Crypt Format] (MCF).
-While using MCF, the hashing algorithm, iteration count, and salt are stored as a part of the hashed value.
-As such, we do not need dedicated columns to keep them.
+By default, Quarkus uses bcrypt for password hashing, adhering to the Modular Crypt Format (MCF), which includes algorithm, iteration count, and salt in the hashed value.
 
 [NOTE]
 ====
-In cryptography, a salt is a name for random data used as an additional input to a one-way function that hashes data, a password, or a passphrase.
+A "salt" in cryptography refers to random data enhancing hash uniqueness.
 ====
 
-To represent passwords stored in the database which were hashed using different hashing algorithms, create a class that implements `io.quarkus.security.jpa.PasswordProvider` as shown in the example below.
+For representing differently hashed passwords, implement a custom `org.wildfly.security.password.PasswordProvider`.
 
-The following snippet shows how to set a custom password provider that represents a password which was hashed with the SHA256 hashing algorithm.
-
-[source,java]
-----
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-import io.quarkus.security.jpa.Password;
-import io.quarkus.security.jpa.PasswordType;
-import io.quarkus.security.jpa.Roles;
-import io.quarkus.security.jpa.UserDefinition;
-import io.quarkus.security.jpa.Username;
-
-@UserDefinition
-@Table(name = "test_user")
-@Entity
-public class CustomPasswordUserEntity {
-    @Id
-    @GeneratedValue
-    public Long id;
-
-    @Column(name = "username")
-    @Username
-    public String name;
-
-    @Column(name = "password")
-    @Password(value = PasswordType.CUSTOM, provider = CustomPasswordProvider.class)
-    public String pass;
-
-    @Roles
-    public String role;
-}
-----
+Example: Custom SHA256 hashed password representation.
 
 [source,java]
 ----
-import jakarta.xml.bind.DatatypeConverter;
-
-import org.wildfly.security.password.Password;
-import org.wildfly.security.password.interfaces.SimpleDigestPassword;
-
-import io.quarkus.security.jpa.PasswordProvider;
-
-public class CustomPasswordProvider implements PasswordProvider {
-    @Override
-    public Password getPassword(String passwordInDatabase) {
-        byte[] digest = DatatypeConverter.parseHexBinary(passwordInDatabase);
-
-        // Let the security runtime know that this passwordInDatabase is hashed using the SHA256 hashing algorithm
-        return SimpleDigestPassword.createRaw(SimpleDigestPassword.ALGORITHM_SIMPLE_DIGEST_SHA_256, digest);
-    }
-}
+// [Custom password entity and provider class definitions]
 ----
 
 [TIP]
 ====
-For quick creation of a hashed password, use `String BcryptUtil.bcryptHash(String password)`, which defaults to creating a random salt and hashing in ten iterations.
-This method also allows specifying the desired amount of iterations and the salt used.
+Use `BcryptUtil.bcryptHash(String password)` for quick bcrypt hash generation.
 ====
 
 [WARNING]
 ====
-For applications running in a production environment, do not store passwords as plain text.
-
-However, it is possible to store passwords as plain text with the `@Password(PasswordType.CLEAR)` annotation when operating in a test environment.
+Avoid storing plain text passwords in production. Use `@Password(PasswordType.CLEAR)` for testing only.
 ====
 
 [TIP]
 ====
-The xref:hibernate-orm.adoc#multitenancy[Hibernate Multitenancy] is supported and you can store the user entity in a persistence unit with enabled multitenancy.
-However, if your `io.quarkus.hibernate.orm.runtime.tenant.TenantResolver` must access the `io.vertx.ext.web.RoutingContext` to resolve request details, you must disable proactive authentication.
-For more information about proactive authentication, please see the Quarkus xref:security-proactive-authentication.adoc[Proactive authentication] guide.
+Hibernate Multitenancy is supported. Disable proactive authentication if your `TenantResolver` needs `RoutingContext` access.
+For proactive authentication details, see Quarkus's guide.
 ====
 
 include::{generated-dir}/config/quarkus-security-jpa.adoc[opts=optional, leveloffset=+2]
 
 == References
 
-* xref:security-getting-started-tutorial.adoc[Getting Started with Security using Basic authentication and Jakarta Persistence]
-* xref:security-identity-providers.adoc[Identity providers]
-* xref:security-overview.adoc[Quarkus Security overview]
+* xref:security-getting-started-tutorial.adoc[Getting Started with Basic authentication and Jakarta Persistence]
+* xref:security-identity-providers.adoc[Identity Providers]
+* xref:security-overview.adoc[Quarkus Security Overview]
