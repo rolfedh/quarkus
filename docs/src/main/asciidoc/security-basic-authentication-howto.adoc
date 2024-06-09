@@ -11,7 +11,7 @@ include::_attributes.adoc[]
 :topics: security,authentication,basic-authentication,http
 :extensions: io.quarkus:quarkus-vertx-http,io.quarkus:quarkus-elytron-security-jdbc,io.quarkus:quarkus-elytron-security-ldap,io.quarkus:quarkus-security-jpa-reactive
 
-Enable xref:security-basic-authentication.adoc[Basic authentication] for your Quarkus project and allow users to authenticate with a username and password.
+Enable link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication] for your Quarkus project and allow users to authenticate with a username and password.
 
 == Prerequisites
 
@@ -19,13 +19,14 @@ Enable xref:security-basic-authentication.adoc[Basic authentication] for your Qu
 For example:
 
 ifndef::no-quarkus-security-jpa-reactive[]
-** xref:security-jpa.adoc[Quarkus Security Jakarta Persistence extensions (`quarkus-security-jpa` or `quarkus-security-jpa-reactive`)]
+** link:{default-url}/getting-started-with-security/security-jpa[Quarkus Security Jakarta Persistence extensions (`security-jpa` or `security-jpa-reactive`)]
 endif::no-quarkus-security-jpa-reactive[]
 ifdef::no-quarkus-security-jpa-reactive[]
 ** xref:security-jpa.adoc[Quarkus Security Jakarta Persistence extension (`quarkus-security-jpa`)]
 endif::no-quarkus-security-jpa-reactive[]
-** xref:security-properties.adoc[Elytron security properties file extension `(quarkus-elytron-security-properties-file)`]
-** xref:security-jdbc.adoc[Elytron security JDBC extension `(quarkus-elytron-security-jdbc)`]
+** link:{quarkusio-guides}/security-properties[Elytron security properties file extension `(quarkus-elytron-security-properties-file)`]
+
+** link:{quarkusio-guides}/security-jdbc[Elytron security JDBC extension `(quarkus-elytron-security-jdbc)`]
 
 The following procedure outlines how you can enable Basic authentication for your application by using the `elytron-security-properties-file` extension.
 
@@ -62,7 +63,7 @@ quarkus.security.users.embedded.roles.bob=user <2>
 <1> The user, `alice`, has `alice` as their password and `admin` as their role.
 <2> The user, `bob`, has `bob` as their password and `user` as their role.
 +
-For information about other methods that you can use to configure the required user credentials, see the xref:security-testing.adoc#configuring-user-information[Configuring User Information] section of the Quarkus "Security Testing" guide.
+For information about other methods that you can use to configure the required user credentials, see the link:{quarkusio-guides}/security-testing#configuring-user-information[Configuring User Information] section of the Quarkus "Security Testing" guide.
 +
 [IMPORTANT]
 ====
@@ -72,11 +73,11 @@ For securing a production application, it is crucial to use a database to store 
 
 == Next steps
 
-For a more detailed walk-through that shows you how to configure Basic authentication together with Jakarta Persistence for storing user credentials in a database, see the xref:security-getting-started-tutorial.adoc[Getting started with Security by using Basic authentication and Jakarta Persistence] guide.
+For a more detailed walk-through that shows you how to configure Basic authentication together with Jakarta Persistence for storing user credentials in a database, see the link:{default-url}/getting-started-with-security/security-getting-started-tutorial[Getting started with Security by using Basic authentication and Jakarta Persistence] guide.
 
 == References
 
-* xref:security-overview.adoc[Quarkus Security overview]
-* xref:security-identity-providers.adoc[Identity Providers]
-* xref:security-testing.adoc#configuring-user-information[Configuring User Information in application.properties]
-* xref:security-basic-authentication.adoc[Basic authentication]
+* link:{default-url}/security-overview/security-overview[Quarkus Security overview]
+* link:{default-url}/security-architecture/security-identity-providers[Identity Providers]
+* link:{quarkusio-guides}/security-testing#configuring-user-information[Configuring User Information in application.properties]
+* link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication]

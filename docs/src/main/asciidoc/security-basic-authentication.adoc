@@ -61,18 +61,18 @@ Depending on the use case, other authentication mechanisms that delegate usernam
 
 For more information about how you can secure your Quarkus applications by using Basic authentication, see the following resources:
 
-* xref:security-basic-authentication-howto.adoc[Enable Basic authentication]
-* xref:security-getting-started-tutorial.adoc[Getting started with Security by using Basic authentication and Jakarta Persistence]
+* link:{default-url}/basic-authentication/security-basic-authentication-howto[Enable Basic authentication]
+* link:{default-url}/getting-started-with-security/security-getting-started-tutorial[Getting started with Security by using Basic authentication and Jakarta Persistence]
 
 == Role-based access control
 
-{project-name} also includes built-in security to allow for role-based access control (RBAC) based on the common security annotations @RolesAllowed, @DenyAll, @PermitAll on REST endpoints and CDI beans.
-For more information, see the Quarkus xref:security-authorize-web-endpoints-reference.adoc[Authorization of web endpoints] guide.
+{project-name} also includes built-in security to allow for role-based access control (RBAC) based on the common security annotations `@RolesAllowed`, `@DenyAll`, `@PermitAll` on REST endpoints and CDI beans.
+For more information, see the Quarkus link:{default-url}/authorization/security-authorize-web-endpoints-reference[Authorization of web endpoints] guide.
 
 == References
 
-* xref:security-overview.adoc[Quarkus Security overview]
-* xref:security-architecture.adoc[Quarkus Security architecture]
-* xref:security-authentication-mechanisms.adoc#other-supported-authentication-mechanisms[Other supported authentication mechanisms]
-* xref:security-identity-providers.adoc[Identity providers]
-* xref:security-authorize-web-endpoints-reference.adoc[Authorization of web endpoints]
+* link:{default-url}/security-overview/security-overview[Quarkus Security overview]
+* link:{default-url}/security-architecture/security-architecture[Quarkus Security architecture]
+* link:{default-url}/security-architecture/security-authentication-mechanisms#other-supported-authentication-mechanisms[Other supported authentication mechanisms]
+* link:{default-url}/security-architecture/security-identity-providers[Identity providers]
+* link:{default-url}/authorization/security-authorize-web-endpoints-reference[Authorization of web endpoints]

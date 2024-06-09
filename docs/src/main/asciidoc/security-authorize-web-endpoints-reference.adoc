@@ -23,7 +23,7 @@ If you use Jakarta RESTful Web Services, consider using `quarkus.security.jaxrs.
 
 Authorization is based on user roles that the security provider provides.
 To customize these roles, a `SecurityIdentityAugmentor` can be created, see
-xref:security-customization.adoc#security-identity-customization[Security Identity Customization].
+link:{quarkusio-guides}/security-customization#security-identity-customization[Security Identity Customization].
 
 [[authorization-using-configuration]]
 == Authorization using configuration
@@ -328,7 +328,7 @@ Permissions can be reenabled at runtime with a system property or environment va
 
 === Permission paths and HTTP root path
 
-The `quarkus.http.root-path` configuration property changes the xref:http-reference.adoc#context-path[http endpoint context path].
+The `quarkus.http.root-path` configuration property changes the link:{quarkusio-guides}/http-reference#context-path[http endpoint context path].
 
 By default, `quarkus.http.root-path` is prepended automatically to configured permission paths then do not use a forward slash, for example:
 
@@ -361,7 +361,7 @@ For more information, see link:https://quarkus.io/blog/path-resolution-in-quarku
 === Map `SecurityIdentity` roles
 
 Winning role-based policy can map the `SecurityIdentity` roles to the deployment-specific roles.
-These roles are then applicable for endpoint authorization by using the @RolesAllowed annotation.
+These roles are then applicable for endpoint authorization by using the `@RolesAllowed` annotation.
 
 [source,properties]
 ----
@@ -389,7 +389,7 @@ quarkus.http.auth.policy.admin-policy1.roles-allowed=admin
 quarkus.http.auth.permission.roles1.paths=/admin/*
 quarkus.http.auth.permission.roles1.policy=admin-policy1
 ----
-<1> <<custom-http-security-policy>> will be also applied on the `/admin/1` path together with the `admin-policy1` policy.
+<1> xref:custom-http-security-policy[Custom HttpSecurityPolicy] will be also applied on the `/admin/1` path together with the `admin-policy1` policy.
 
 TIP: Configuring many shared permission checks is less effective than configuring unshared ones.
 Use shared permissions to complement unshared permission checks like in the example below.
@@ -433,7 +433,7 @@ s| @RolesAllowed | Specifies the list of security roles allowed to access method
 As an equivalent to `@RolesAllowed("**")`, {project-name} also provides the `io.quarkus.security.Authenticated` annotation that permits any authenticated user to access the resource.
 |===
 
-The following <<subject-example>> demonstrates an endpoint that uses both Jakarta REST and Common Security annotations to describe and secure its endpoints.
+The following xref:subject-example[SubjectExposingResource example] demonstrates an endpoint that uses both Jakarta REST and Common Security annotations to describe and secure its endpoints.
 
 [[subject-example]]
 .SubjectExposingResource example
@@ -486,9 +486,9 @@ This returns `non-null` for a secured endpoint.
 <5> The `/subject/denied` endpoint declares the `@DenyAll` annotation, disallowing all direct access to it as a REST method, regardless of the user calling it.
 The method is still invokable internally by other methods in this class.
 
-CAUTION: If you plan to use standard security annotations on the IO thread, review the information in xref:security-proactive-authentication.adoc[Proactive Authentication].
+CAUTION: If you plan to use standard security annotations on the IO thread, review the information in link:{default-url}/security-architecture/security-proactive-authentication[Proactive Authentication].
 
-The `@RolesAllowed` annotation value supports xref:config-reference.adoc#property-expressions[property expressions] including default values and nested property expressions.
+The `@RolesAllowed` annotation value supports link:{quarkusio-guides}/config-reference#property-expressions[property expressions] including default values and nested property expressions.
 Configuration properties used with the annotation are resolved at runtime.
 
 .Annotation value examples
@@ -664,13 +664,13 @@ Both resource methods `createOrUpdate` have equal authorization requirements.
 By default, string-based permission is performed by `io.quarkus.security.StringPermission`.
 <5> Permissions are not beans, therefore the only way to obtain bean instances is programmatically by using `Arc.container()`.
 
-CAUTION: If you plan to use the `@PermissionsAllowed` on the IO thread, review the information in xref:security-proactive-authentication.adoc[Proactive Authentication].
+CAUTION: If you plan to use the `@PermissionsAllowed` on the IO thread, review the information in link:{default-url}/security-architecture/security-proactive-authentication[Proactive Authentication].
 
 NOTE: `@PermissionsAllowed` is not repeatable on the class level due to a limitation with Quarkus interceptors.
-For more information, see the xref:cdi-reference.adoc#repeatable-interceptor-bindings[Repeatable interceptor bindings] section of the Quarkus "CDI reference" guide.
+For more information, see the link:{quarkusio-guides}/cdi-reference#repeatable-interceptor-bindings[Repeatable interceptor bindings] section of the Quarkus "CDI reference" guide.
 
 The easiest way to add permissions to a role-enabled `SecurityIdentity` instance is to map roles to permissions.
-Use <<authorization-using-configuration>> to grant the required `SecurityIdentity` permissions for `CRUDResource` endpoints to authenticated requests, as outlined in the following example:
+Use xref:authorization-using-configuration[Authorization using configuration] to grant the required `SecurityIdentity` permissions for `CRUDResource` endpoints to authenticated requests, as outlined in the following example:
 
 [source,properties]
 ----
@@ -688,7 +688,7 @@ quarkus.http.auth.permission.roles2.policy=role-policy2
 Similarly, for the `@PermissionsAllowed` annotation, `io.quarkus.security.StringPermission` is used by default.
 <2> Permissions `create`, `update`, and `read` are mapped to the role `admin`.
 <3> The role policy `role-policy1` allows only authenticated requests to access `/crud/modify` and `/crud/id` sub-paths.
-For more information about the path-matching algorithm, see <<matching-multiple-paths>> later in this guide.
+For more information about the path-matching algorithm, see xref:matching-multiple-paths[Matching multiple paths: longest path wins] later in this guide.
 <4> You can specify a custom implementation of the `java.security.Permission` class.
 Your custom class must define exactly one constructor that accepts the permission name and optionally some actions, for example, `String` array.
 In this scenario, the permission `list` is added to the `SecurityIdentity` instance as `new CustomPermission("list")`.
@@ -860,11 +860,11 @@ quarkus.http.auth.permission.roles3.policy=role-policy3
 Because `MediaLibrary` is the `TvLibrary` class parent, a user with the `admin` role is also permitted to modify `TvLibrary`.
 
 TIP: The `/library/*` path can be tested from a Keycloak provider Dev UI page, because the user `alice` which is created
-automatically by the xref:security-openid-connect-dev-services.adoc[Dev Services for Keycloak] has an `admin` role.
+automatically by the link:{quarkusio-guides}/security-openid-connect-dev-services[Dev Services for Keycloak] has an `admin` role.
 
 The examples provided so far demonstrate role-to-permission mapping.
 It is also possible to programmatically add permissions to the `SecurityIdentity` instance.
-In the following example, xref:security-customization.adoc#security-identity-customization[`SecurityIdentity` is customized] to add the same permission that was previously granted with the HTTP role-based policy.
+In the following example, link:{quarkusio-guides}/security-customization#security-identity-customization[`SecurityIdentity` is customized] to add the same permission that was previously granted with the HTTP role-based policy.
 
 .Example of adding the `LibraryPermission` programmatically to `SecurityIdentity`
 
@@ -916,13 +916,13 @@ public class PermissionsIdentityAugmentor implements SecurityIdentityAugmentor {
 Because `MediaLibrary` is the `TvLibrary` class parent, a user with the `admin` role is also permitted to modify `TvLibrary`.
 <2> You can add a permission checker through `io.quarkus.security.runtime.QuarkusSecurityIdentity.Builder#addPermissionChecker`.
 
-CAUTION: Annotation-based permissions do not work with custom xref:security-customization.adoc#jaxrs-security-context[Jakarta REST SecurityContexts] because there are no permissions in `jakarta.ws.rs.core.SecurityContext`.
+CAUTION: Annotation-based permissions do not work with custom link:{quarkusio-guides}/security-customization#jaxrs-security-context[Jakarta REST SecurityContexts] because there are no permissions in `jakarta.ws.rs.core.SecurityContext`.
 
 == References
 
-* xref:security-overview.adoc[Quarkus Security overview]
-* xref:security-architecture.adoc[Quarkus Security architecture]
-* xref:security-authentication-mechanisms.adoc#other-supported-authentication-mechanisms[Authentication mechanisms in Quarkus]
-* xref:security-basic-authentication.adoc[Basic authentication]
-* xref:security-getting-started-tutorial.adoc[Getting started with Security by using Basic authentication and Jakarta Persistence]
-* xref:security-oidc-bearer-token-authentication.adoc#token-scopes-and-security-identity-permissions[OpenID Connect Bearer Token Scopes And SecurityIdentity Permissions]
+* link:{default-url}/security-overview/security-overview[Quarkus Security overview]
+* link:{default-url}/security-architecture/security-architecture[Quarkus Security architecture]
+* link:{default-url}/security-architecture/security-authentication-mechanisms#other-supported-authentication-mechanisms[Authentication mechanisms in Quarkus]
+* link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication]
+* link:{default-url}/getting-started-with-security/security-getting-started-tutorial[Getting started with Security by using Basic authentication and Jakarta Persistence]
+* link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication#token-scopes-and-security-identity-permissions[OpenID Connect Bearer Token Scopes And SecurityIdentity Permissions]

@@ -12,70 +12,70 @@ include::_attributes.adoc[]
 
 Quarkus Security is a framework that provides the architecture, multiple authentication and authorization mechanisms, and other tools to build secure and production-quality Java applications.
 
-Before building security into your Quarkus applications, learn about the xref:security-architecture.adoc[Quarkus Security architecture] and the different authentication mechanisms and features you can use.
+Before building security into your Quarkus applications, learn about the link:{default-url}/security-architecture/security-architecture[Quarkus Security architecture] and the different authentication mechanisms and features you can use.
 
 == Key features of Quarkus Security
 
 The Quarkus Security framework provides built-in security authentication mechanisms for Basic, Form-based, and mutual TLS (mTLS) authentication.
 ifndef::no-webauthn-authentication[]
-You can also use other well-known xref:security-authentication-mechanisms.adoc#other-supported-authentication-mechanisms[authentication mechanisms], such as OpenID Connect (OIDC) and WebAuthn.
+You can also use other well-known link:{default-url}/security-architecture/security-authentication-mechanisms#other-supported-authentication-mechanisms[authentication mechanisms], such as OpenID Connect (OIDC) and WebAuthn.
 endif::no-webauthn-authentication[]
 ifdef::no-webauthn-authentication[]
-You can also use other well-known xref:security-authentication-mechanisms.adoc#other-supported-authentication-mechanisms[authentication mechanisms], such as OpenID Connect (OIDC).
+You can also use other well-known link:{default-url}/security-architecture/security-authentication-mechanisms#other-supported-authentication-mechanisms[authentication mechanisms], such as OpenID Connect (OIDC).
 endif::no-webauthn-authentication[]
-Authentication mechanisms depend on xref:security-identity-providers.adoc[Identity providers] to verify the authentication credentials and map them to a `SecurityIdentity` instance with the username, roles, original authentication credentials, and other attributes.
+Authentication mechanisms depend on link:{default-url}/security-architecture/security-identity-providers[Identity providers] to verify the authentication credentials and map them to a `SecurityIdentity` instance with the username, roles, original authentication credentials, and other attributes.
 
 {project-name} also includes built-in security to allow for role-based access control (RBAC) based on the common security annotations `@RolesAllowed`, `@DenyAll`, `@PermitAll` on REST endpoints, and Contexts and Dependency Injection (CDI) beans.
-For more information, see the Quarkus xref:security-authorize-web-endpoints-reference.adoc[Authorization of web endpoints] guide.
+For more information, see the Quarkus link:{default-url}/authorization/security-authorize-web-endpoints-reference[Authorization of web endpoints] guide.
 
 Quarkus Security also supports the following features:
 
-* xref:security-proactive-authentication.adoc[Proactive authentication]
-* xref:http-reference.adoc#ssl[Secure connections with SSL/TLS]
-* <<cross-origin-resource-sharing>>
-* <<csrf-prevention>>
-* <<samesite-cookies>>
-* <<secrets-engines>>
-* <<rest-data-panache>>
-* <<secure-serialization>>
-* xref:security-vulnerability-detection.adoc[Security vulnerability detection and National Vulnerability Database (NVD) registration]
+* link:{default-url}/security-architecture/security-proactive-authentication[Proactive authentication]
+* link:{quarkusio-guides}/http-reference#ssl[Secure connections with SSL/TLS]
+* xref:cross-origin-resource-sharing[Cross-origin resource sharing]
+* xref:csrf-prevention[Cross-Site Request Forgery (CSRF) prevention]
+* xref:samesite-cookies[SameSite cookies]
+* xref:secrets-engines[Secrets engines]
+* xref:rest-data-panache[Secure auto-generated resources by REST Data with Panache]
+* xref:secure-serialization[Secure serialization]
+* link:{quarkusio-guides}/security-vulnerability-detection[Security vulnerability detection and National Vulnerability Database (NVD) registration]
 
 Quarkus Security is also highly customizable.
-For more information, see the Quarkus xref:security-customization.adoc[Security tips and tricks] guide.
+For more information, see the Quarkus link:{quarkusio-guides}/security-customization[Security tips and tricks] guide.
 
 == Getting started with Quarkus Security
 
-To get started with security in Quarkus, consider securing your Quarkus application endpoints with the built-in Quarkus xref:security-basic-authentication.adoc[Basic authentication] and the Jakarta Persistence identity provider and enabling role-based access control.
+To get started with security in Quarkus, consider securing your Quarkus application endpoints with the built-in Quarkus link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication] and the Jakarta Persistence identity provider and enabling role-based access control.
 
-Complete the steps in the xref:security-getting-started-tutorial.adoc[Getting started with Security by using Basic authentication and Jakarta Persistence] tutorial.
+Complete the steps in the link:{default-url}/getting-started-with-security/security-getting-started-tutorial[Getting started with Security by using Basic authentication and Jakarta Persistence] tutorial.
 
-After successfully securing your Quarkus application with Basic authentication, you can increase the security further by adding more advanced authentication mechanisms, for example, the Quarkus xref:security-oidc-code-flow-authentication.adoc[OpenID Connect (OIDC) authorization code flow mechanism] guide.
+After successfully securing your Quarkus application with Basic authentication, you can increase the security further by adding more advanced authentication mechanisms, for example, the Quarkus link:{default-url}/openid-connect-authentication/security-oidc-code-flow-authentication[OpenID Connect (OIDC) authorization code flow mechanism] guide.
 
 == Quarkus Security testing
 
-For guidance on testing Quarkus Security features and ensuring that your Quarkus applications are securely protected, see the xref:security-testing.adoc[Security testing] guide.
+For guidance on testing Quarkus Security features and ensuring that your Quarkus applications are securely protected, see the link:{quarkusio-guides}/security-testing[Security testing] guide.
 
 == More about security features in Quarkus
 
-[[cross-origin-resource-sharing]]
+[id="cross-origin-resource-sharing"]
 === Cross-origin resource sharing
 
 To make your Quarkus application accessible to another application running on a different domain, you need to configure cross-origin resource sharing (CORS).
-For more information about the CORS filter Quarkus provides, see the xref:security-cors.adoc#cors-filter[CORS filter] section of the Quarkus "Cross-origin resource sharing" guide.
+For more information about the CORS filter Quarkus provides, see the link:{quarkusio-guides}/security-cors#cors-filter[CORS filter] section of the Quarkus "Cross-origin resource sharing" guide.
 
-[[csrf-prevention]]
+[id="csrf-prevention"]
 === Cross-Site Request Forgery (CSRF) prevention
 
-Quarkus Security provides a RESTEasy Reactive filter that can protect your applications against a https://owasp.org/www-community/attacks/csrf[Cross-Site Request Forgery] attack.
-For more information, see the Quarkus xref:security-csrf-prevention.adoc[Cross-Site Request Forgery Prevention] guide.
+Quarkus Security provides a Quarkus REST (formerly RESTEasy Reactive) filter that can protect your applications against a https://owasp.org/www-community/attacks/csrf[Cross-Site Request Forgery] attack.
+For more information, see the Quarkus link:{quarkusio-guides}/security-csrf-prevention[Cross-Site Request Forgery Prevention] guide.
 
-[[samesite-cookies]]
+[id="samesite-cookies"]
 === SameSite cookies
 
 You can add a link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite[SameSite] cookie property to any of the cookies set by a Quarkus endpoint.
-For more information, see the xref:http-reference.adoc#same-site-cookie[SameSite cookies] section of the Quarkus "HTTP reference" guide.
+For more information, see the link:{quarkusio-guides}/http-reference#same-site-cookie[SameSite cookies] section of the Quarkus "HTTP reference" guide.
 
-[[secrets-engines]]
+[id="secrets-engines"]
 === Secrets engines
 You can use secrets engines with Quarkus to store, generate, or encrypt data.
 
@@ -84,29 +84,29 @@ Quarkus provides additional extensions in Quarkiverse for securely storing crede
 == Secrets in environment properties
 
 Quarkus provides support to store secrets in environment properties.
-For more information, see the Quarkus xref:config.adoc#secrets-in-environment-properties[store secrets in an environment properties file] guide.
+For more information, see the Quarkus link:{quarkusio-guides}/config#secrets-in-environment-properties[store secrets in an environment properties file] guide.
 
-[[secure-serialization]]
+[id="secure-serialization"]
 === Secure serialization
 
-If your Quarkus Security architecture includes RESTEasy Reactive and Jackson, Quarkus can limit the fields included in JSON serialization based on the configured security.
-For more information, see the xref:resteasy-reactive.adoc#secure-serialization[JSON serialization] section of the Quarkus “Writing REST services with RESTEasy Reactive” guide.
+If your Quarkus Security architecture includes Quarkus REST (formerly RESTEasy Reactive) and Jackson, Quarkus can limit the fields included in JSON serialization based on the configured security.
+For more information, see the link:{quarkusio-guides}/rest#secure-serialization[JSON serialization] section of the Quarkus “Writing REST services with Quarkus REST (formerly RESTEasy Reactive)” guide.
 
 
-[[rest-data-panache]]
+[id="rest-data-panache"]
 === Secure auto-generated resources by REST Data with Panache
 
 If you use the REST Data with Panache extension to auto-generate your resources, you can still use security annotations within the package `jakarta.annotation.security`.
-For more information, see the xref:rest-data-panache.adoc#securing-endpoints[Securing endpoints] section of the Quarkus "Generating Jakarta REST resources with Panache" guide.
+For more information, see the link:{quarkusio-guides}/rest-data-panache#securing-endpoints[Securing endpoints] section of the Quarkus "Generating Jakarta REST resources with Panache" guide.
 
 == Security vulnerability detection
 
 Most Quarkus tags get reported in the US link:https://nvd.nist.gov[National Vulnerability Database (NVD)].
-For information about security vulnerabilities, see the xref:security-vulnerability-detection.adoc[Security vulnerability detection and reporting in Quarkus] guide.
+For information about security vulnerabilities, see the link:{quarkusio-guides}/security-vulnerability-detection[Security vulnerability detection and reporting in Quarkus] guide.
 
 == References
 
-* xref:security-basic-authentication.adoc[Basic authentication]
-* xref:security-getting-started-tutorial.adoc[Getting started with Security by using Basic authentication and Jakarta Persistence]
-* xref:security-oidc-code-flow-authentication-tutorial.adoc[Protect a web application by using OIDC authorization code flow]
-* xref:security-oidc-bearer-token-authentication-tutorial.adoc[Protect a service application by using OIDC Bearer token authentication]
+* link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication]
+* link:{default-url}/getting-started-with-security/security-getting-started-tutorial[Getting started with Security by using Basic authentication and Jakarta Persistence]
+* link:{default-url}/openid-connect-authentication/security-oidc-code-flow-authentication-tutorial[Protect a web application by using OIDC authorization code flow]
+* link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication-tutorial[Protect a service application by using OIDC Bearer token authentication]

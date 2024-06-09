@@ -11,6 +11,7 @@ include::_attributes.adoc[]
 :toclevels: 4
 :topics: security,oidc,keycloak,authentication
 :extensions: io.quarkus:quarkus-oidc
+:context: security-oidc-code-flow-authentication
 
 To protect your web applications, you can use the industry-standard OpenID Connect (OIDC) Authorization Code Flow mechanism provided by the Quarkus OIDC extension.
 
@@ -40,13 +41,13 @@ The following tokens are issued:
 * Access token: The Quarkus web-app might use the access token to access the UserInfo API to get additional information about the authenticated user or to propagate it to another endpoint.
 * Refresh token: (Optional) If the ID and access tokens expire, the Quarkus web-app can use the refresh token to get new ID and access tokens.
 
-See also the xref:security-oidc-configuration-properties-reference.adoc[OIDC configuration properties] reference guide.
+See also the link:{default-url}/openid-connect-authentication/security-oidc-configuration-properties-reference[OIDC configuration properties] reference guide.
 
-To learn about how you can protect web applications by using the OIDC Authorization Code Flow mechanism, see xref:security-oidc-code-flow-authentication-tutorial.adoc[Protect a web application by using OIDC authorization code flow].
+To learn about how you can protect web applications by using the OIDC Authorization Code Flow mechanism, see link:{default-url}/openid-connect-authentication/security-oidc-code-flow-authentication-tutorial[Protect a web application by using OIDC authorization code flow].
 
-If you want to protect service applications by using OIDC Bearer token authentication, see xref:security-oidc-bearer-token-authentication.adoc[OIDC Bearer token authentication].
+If you want to protect service applications by using OIDC Bearer token authentication, see link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OIDC Bearer token authentication].
 
-For information about how to support multiple tenants, see xref:security-openid-connect-multitenancy.adoc[Using OpenID Connect Multi-Tenancy].
+For information about how to support multiple tenants, see link:{default-url}/openid-connect-authentication/security-openid-connect-multitenancy[Using OpenID Connect Multi-Tenancy].
 
 == Using the authorization code flow mechanism
 
@@ -96,7 +97,7 @@ For example, a provider that supports both global and application-specific end-s
 This URL will log the user out of all the applications into which the user is currently logged in.
 However, if the requirement is for the current application to log the user out of a specific application only, you can override the global end-session URL, by setting the `quarkus.oidc.end-session-path=logout` parameter.
 
-[[oidc-provider-client-authentication]]
+[id="oidc-provider-client-authentication"]
 ==== OIDC provider client authentication
 
 OIDC providers typically require applications to be identified and authenticated when they interact with the OIDC endpoints.
@@ -124,7 +125,7 @@ quarkus.oidc.client-id=quarkus-app
 quarkus.oidc.credentials.client-secret.value=mysecret
 ----
 
-The following example shows the secret retrieved from a xref:credentials-provider.adoc[credentials provider]:
+The following example shows the secret retrieved from a link:{quarkusio-guides}/credentials-provider[credentials provider]:
 
 [source,properties]
 ----
@@ -156,7 +157,7 @@ quarkus.oidc.client-id=quarkus-app
 quarkus.oidc.credentials.jwt.secret=AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow
 ----
 
-.Example of `client_secret_jwt`, where the secret is retrieved from a xref:credentials-provider.adoc[credentials provider]:
+.Example of `client_secret_jwt`, where the secret is retrieved from a link:{quarkusio-guides}/credentials-provider[credentials provider]:
 
 [source,properties]
 ----
@@ -272,7 +273,7 @@ quarkus.oidc.tls.trust-store-password=${trust-store-password}
 
 ===== POST query
 
-Some providers, such as the xref:security-openid-connect-providers#strava[Strava OAuth2 provider], require client credentials be posted as HTTP POST query parameters:
+Some providers, such as the link:{quarkusio-guides}/security-openid-connect-providers#strava[Strava OAuth2 provider], require client credentials be posted as HTTP POST query parameters:
 
 [source,properties]
 ----
@@ -285,7 +286,7 @@ quarkus.oidc.credentials.client-secret.method=query
 ==== Introspection endpoint authentication
 
 Some OIDC providers require authentication to its introspection endpoint by using Basic authentication and with credentials that are different from the `client_id` and `client_secret`.
-If you have previously configured security authentication to support either the `client_secret_basic` or `client_secret_post` client authentication methods as described in the <<oidc-provider-client-authentication,OIDC provider client authentication>> section, you might need to apply the additional configuration as follows.
+If you have previously configured security authentication to support either the `client_secret_basic` or `client_secret_post` client authentication methods as described in the xref:oidc-provider-client-authentication[OIDC provider client authentication] section, you might need to apply the additional configuration as follows.
 
 If the tokens have to be introspected and the introspection endpoint-specific authentication mechanism is required, you can configure `quarkus-oidc` as follows:
 
@@ -295,7 +296,7 @@ quarkus.oidc.introspection-credentials.name=introspection-user-name
 quarkus.oidc.introspection-credentials.secret=introspection-user-secret
 ----
 
-[[oidc-request-filters]]
+[id="oidc-request-filters_{context}"]
 ==== OIDC request filters
 
 You can filter OIDC requests made by Quarkus to the OIDC provider by registering one or more `OidcRequestFilter` implementations, which can update or add new request headers and can also log requests.
@@ -417,7 +418,7 @@ To prevent the user from being redirected to this page to be re-authenticated, e
 
 You can access information about authorization in different ways.
 
-[[access_id_and_access_tokens]]
+[id="access_id_and_access_tokens"]
 ==== Accessing ID and access tokens
 //SJ: new concept topic to describe the different token types and usage proposed in next iteration
 The OIDC code authentication mechanism acquires three tokens during the authorization code flow: https://openid.net/specs/openid-connect-core-1_0.html#IDToken[ID token], access token, and refresh token.
@@ -490,9 +491,9 @@ public class ProtectedResource {
 
 Injection of the `JsonWebToken` and `AccessTokenCredential` is supported in both `@RequestScoped` and `@ApplicationScoped` contexts.
 
-Quarkus OIDC uses the refresh token to refresh the current ID and access tokens as part of its <<session-management,session management>> process.
+Quarkus OIDC uses the refresh token to refresh the current ID and access tokens as part of its xref:session-management[session management] process.
 
-[[user-info]]
+[id="user-info_{context}"]
 ==== User info
 
 If the ID token does not provide enough information about the currently authenticated user, you can get more information from the `UserInfo` endpoint.
@@ -501,17 +502,17 @@ Set the `quarkus.oidc.authentication.user-info-required=true` property to reques
 A request is sent to the OIDC provider `UserInfo` endpoint by using the access token returned with the authorization code grant response, and an `io.quarkus.oidc.UserInfo` (a simple `jakarta.json.JsonObject` wrapper) object is created.
 `io.quarkus.oidc.UserInfo` can be injected or accessed as a SecurityIdentity `userinfo` attribute.
 
-[[config-metadata]]
+[id="config-metadata_{context}"]
 ==== Accessing the OIDC configuration information
 
 The current tenant's discovered link:https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata[OpenID Connect configuration metadata] is represented by `io.quarkus.oidc.OidcConfigurationMetadata` and can be injected or accessed as a `SecurityIdentity` `configuration-metadata` attribute.
 
 The default tenant's `OidcConfigurationMetadata` is injected if the endpoint is public.
 
-[[token-claims-roles]]
+[id="token-claims-roles"]
 ==== Mapping token claims and `SecurityIdentity` roles
 
-The way the roles are mapped to the SecurityIdentity roles from the verified tokens is identical to how it is done for the xref:security-oidc-bearer-token-authentication.adoc[Bearer tokens].
+The way the roles are mapped to the SecurityIdentity roles from the verified tokens is identical to how it is done for the link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[Bearer tokens].
 The only difference is that https://openid.net/specs/openid-connect-core-1_0.html#IDToken[ID token] is used as a source of the roles by default.
 
 [NOTE]
@@ -527,19 +528,19 @@ If the access token contains the roles and this access token is not meant to be 
 If UserInfo is the source of the roles, then set `quarkus.oidc.roles.source=userinfo`, and if needed, `quarkus.oidc.roles.role-claim-path`.
 
 Additionally, you can also use a custom `SecurityIdentityAugmentor` to add the roles.
-For more information, see xref:security-customization.adoc#security-identity-customization[SecurityIdentity customization].
-You can also map `SecurityIdentity` roles created from token claims to deployment-specific roles with the xref:security-authorize-web-endpoints-reference.adoc#map-security-identity-roles[HTTP Security policy].
+For more information, see link:{quarkusio-guides}/security-customization#security-identity-customization[SecurityIdentity customization].
+You can also map `SecurityIdentity` roles created from token claims to deployment-specific roles with the link:{default-url}/authorization/security-authorize-web-endpoints-reference#map-security-identity-roles[HTTP Security policy].
 
 === Ensuring validity of tokens and authentication data
 
 A core part of the authentication process is ensuring the chain of trust and validity of the information.
 This is done by ensuring tokens can be trusted.
 
-[[token-verification-introspection]]
+[id="token-verification-introspection_{context}"]
 ==== Token verification and introspection
 
 The verification process of OIDC authorization code flow tokens follows the Bearer token authentication token verification and introspection logic.
-For more information, see the xref:security-oidc-bearer-token-authentication.adoc#token-verification-introspection[Token verification and introspection] section of the "Quarkus OpenID Connect (OIDC) Bearer token authentication" guide.
+For more information, see the link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication#token-verification-introspection[Token verification and introspection] section of the "Quarkus OpenID Connect (OIDC) Bearer token authentication" guide.
 
 [NOTE]
 ====
@@ -547,19 +548,19 @@ With Quarkus `web-app` applications, only the `IdToken` is verified by default b
 If you expect the access token to contain the roles required to access the current Quarkus endpoint (`quarkus.oidc.roles.source=accesstoken`), then it will also be verified.
 ====
 
-[[token-introspection-userinfo-cache]]
+[id="token-introspection-userinfo-cache_{context}"]
 ==== Token introspection and UserInfo cache
 
 Code flow access tokens are not introspected unless they are expected to be the source of roles.
 However, they will be used to get `UserInfo`.
 There will be one or two remote calls with the code flow access token if the token introspection, `UserInfo`, or both are required.
 
-For more information about using the default token cache or registering a custom cache implementation, see xref:security-oidc-bearer-token-authentication.adoc#token-introspection-userinfo-cache[Token introspection and UserInfo cache].
+For more information about using the default token cache or registering a custom cache implementation, see link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication#token-introspection-userinfo-cache[Token introspection and UserInfo cache].
 
-[[jwt-claim-verification]]
+[id="jwt-claim-verification_{context}"]
 ==== JSON web token claim verification
 
-For information about the claim verification, including the `iss` (issuer) claim, see the xref:security-oidc-bearer-token-authentication.adoc#jwt-claim-verification[JSON Web Token claim verification] section.
+For information about the claim verification, including the `iss` (issuer) claim, see the link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication#jwt-claim-verification[JSON Web Token claim verification] section.
 It applies to ID tokens and also to access tokens in a JWT format, if the `web-app` application has requested the access token verification.
 
 ==== Further security with Proof Key for Code Exchange (PKCE)
@@ -591,7 +592,7 @@ Another important requirement for authentication is to ensure that the data the 
 There are also situations where a logout event is explicitly requested.
 Use the following key points to find the right balance for securing your Quarkus applications:
 
-[[oidc-cookies]]
+[id="oidc-cookies"]
 ==== Cookies
 
 The OIDC adapter uses cookies to keep the session, code flow, and post-logout state.
@@ -619,7 +620,7 @@ For example, if you have Quarkus services deployed on the following two domains,
 * \https://another.address.company.net/
 
 
-[[token-state-manager]]
+[id="token-state-manager"]
 ==== Session cookie and default TokenStateManager
 
 OIDC `CodeAuthenticationMechanism` uses the default `io.quarkus.oidc.TokenStateManager` interface implementation to keep the ID, access, and refresh tokens returned in the authorization code or refresh grant responses in an encrypted session cookie.
@@ -627,10 +628,9 @@ OIDC `CodeAuthenticationMechanism` uses the default `io.quarkus.oidc.TokenStateM
 It makes Quarkus OIDC endpoints completely stateless and it is recommended to follow this strategy to achieve the best scalability results.
 
 ifndef::no-quarkus-oidc-db-token-state-manager[]
-Refer to the <<db-token-state-manager>> section of this guide for information on storing tokens in the database or other server-side storage solutions. This approach is suitable if you prefer and have compelling reasons to store the token state on the server.
+See the xref:db-token-state-manager[Database TokenStateManager] and xref:custom-token-state-manager[Session cookie and custom TokenStateManager] sections of this guide for alternative approaches to storing tokens.
+For example, storing tokens in the database or other server-side storage, if you prefer and have good reasons for storing the token state on the server.
 endif::no-quarkus-oidc-db-token-state-manager[]
-
-See the <<custom-token-state-manager>> section for alternative methods of token storage. This is ideal for those seeking customized solutions for token state management, especially when standard server-side storage does not meet your specific requirements.
 
 You can configure the default `TokenStateManager` to avoid saving an access token in the session cookie and to only keep ID and refresh tokens or a single ID token only.
 
@@ -658,7 +658,7 @@ This can occur when the ID, access, and refresh tokens are JWT tokens and the se
 To work around this issue, you can set `quarkus.oidc.token-state-manager.split-tokens=true` to create a unique session token for each token.
 ifndef::no-quarkus-oidc-db-token-state-manager[]
 An alternative solution is to have the tokens saved in the database.
-For more information, see <<db-token-state-manager>>.
+For more information, see xref:db-token-state-manager[Database TokenStateManager].
 endif::no-quarkus-oidc-db-token-state-manager[]
 
 The default `TokenStateManager` encrypts the tokens before storing them in the session cookie.
@@ -686,10 +686,10 @@ Otherwise, a random key is generated, which can be problematic if the Quarkus ap
 
 You can disable token encryption in the session cookie by setting `quarkus.oidc.token-state-manager.encryption-required=false`.
 
-[[custom-token-state-manager]]
+[id="custom-token-state-manager"]
 ==== Session cookie and custom TokenStateManager
 
-If you want to customize the way the tokens are associated with the session cookie, register a custom `io.quarkus.oidc.TokenStateManager' implementation as an `@ApplicationScoped` CDI bean.
+If you want to customize the way the tokens are associated with the session cookie, register a custom `io.quarkus.oidc.TokenStateManager` implementation as an `@ApplicationScoped` CDI bean.
 
 For example, you might want to keep the tokens in a cache cluster and have only a key stored in a session cookie.
 Note that this approach might introduce some challenges if you need to make the tokens available across multiple microservices nodes.
@@ -749,26 +749,26 @@ public class CustomTokenStateManager implements TokenStateManager {
 }
 ----
 
-For information about the default `TokenStateManager` storing tokens in an encrypted session cookie, see <<token-state-manager>>.
+For information about the default `TokenStateManager` storing tokens in an encrypted session cookie, see xref:token-state-manager[Session cookie and default TokenStateManager].
 
 ifndef::no-quarkus-oidc-db-token-state-manager[]
-For information about the custom Quarkus `TokenStateManager` implementation storing tokens in a database, see <<db-token-state-manager>>.
+For information about the custom Quarkus `TokenStateManager` implementation storing tokens in a database, see xref:db-token-state-manager[Database TokenStateManager].
 
-[[db-token-state-manager]]
+[id="db-token-state-manager"]
 ==== Database TokenStateManager
 
-If you prefer to follow a stateful token storage strategy, you can use a custom `TokenStateManager` provided by Quarkus to have your application store tokens in a database, instead of storing them in an encrypted session cookie,  which is done by default as described in the <<token-state-manager>> section.
+If you prefer to follow a stateful token storage strategy, you can use a custom `TokenStateManager` provided by Quarkus to have your application store tokens in a database, instead of storing them in an encrypted session cookie,  which is done by default as described in the xref:token-state-manager[Session cookie and default TokenStateManager] section.
 
 To use this feature, add the following extension to your project:
 
 :add-extension-extensions: oidc-db-token-state-manager
 include::{includes}/devtools/extension-add.adoc[]
 
-This extension will replace the default `io.quarkus.oidc.TokenStateManager' with a database-based one.
+This extension will replace the default `io.quarkus.oidc.TokenStateManager` with a database-based one.
 
 OIDC Database Token State Manager uses a Reactive SQL client under the hood to avoid blocking because the authentication is likely to happen on an IO thread.
 
-Depending on your database, include and configure exactly one xref:reactive-sql-clients.adoc[Reactive SQL client].
+Depending on your database, include and configure exactly one link:{quarkusio-guides}/reactive-sql-clients[Reactive SQL client].
 The following Reactive SQL clients are supported:
 
 * Reactive Microsoft SQL client
@@ -791,8 +791,10 @@ quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/quarkus_test
 
 Now, if you decided to use OIDC Database Token State Manager, you must add the following dependencies and set a reactive driver URL:
 
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
     <groupId>io.quarkus</groupId>
@@ -803,13 +805,17 @@ Now, if you decided to use OIDC Database Token State Manager, you must add the f
     <artifactId>quarkus-reactive-pg-client</artifactId>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 implementation("io.quarkus:quarkus-oidc-db-token-state-manager")
 implementation("io.quarkus:quarkus-reactive-pg-client")
 ----
+--
 
 [source, properties]
 ----
@@ -851,7 +857,7 @@ public class OidcDbTokenStateManagerEntity {
 }
 ----
 <1> The Hibernate ORM extension will only create this table for you when the database schema is generated.
-For more information, refer to the xref:hibernate-orm.adoc[Hibernate ORM] guide.
+For more information, refer to the link:{quarkusio-guides}/hibernate-orm[Hibernate ORM] guide.
 <2> You can choose a column length depending on the length of your tokens.
 endif::no-quarkus-oidc-db-token-state-manager[]
 
@@ -862,7 +868,7 @@ There are two main ways for the authentication information to expire: the tokens
 Let's start with explicit logout operations.
 
 
-[[user-initiated-logout]]
+[id="user-initiated-logout"]
 ===== User-initiated logout
 
 Users can request a logout by sending a request to the Quarkus endpoint logout path set with a `quarkus.oidc.logout.path` property.
@@ -878,7 +884,7 @@ Note, this URI must be registered as a valid `post_logout_redirect_uri` in the O
 If the `quarkus.oidc.logout.post-logout-path` is set, then a `q_post_logout` cookie will be created and a matching `state` query parameter will be added to the logout redirect URI and the OIDC provider will return this `state` once the logout has been completed.
 It is recommended for the Quarkus `web-app` applications to check that a `state` query parameter matches the value of the `q_post_logout` cookie, which can be done, for example, in a Jakarta REST filter.
 
-Note that a cookie name varies when using xref:security-openid-connect-multitenancy.adoc[OpenID Connect Multi-Tenancy].
+Note that a cookie name varies when using link:{default-url}/openid-connect-authentication/security-openid-connect-multitenancy[OpenID Connect Multi-Tenancy].
 For example, it will be named `q_post_logout_tenant_1` for a tenant with a `tenant_1` ID, and so on.
 
 Here is an example of how to configure a Quarkus application to initiate a logout flow:
@@ -904,7 +910,7 @@ quarkus.http.auth.permission.public.policy=permit
 ----
 
 You might also want to set `quarkus.oidc.authentication.cookie-path` to a path value common to all the application resources, which is `/` in this example.
-For more information, see the <<oidc-cookies,Cookies>> section.
+For more information, see the xref:oidc-cookies[Cookies] section.
 
 [NOTE]
 ====
@@ -938,7 +944,7 @@ quarkus.oidc.logout.extra-params.client_id=${quarkus.oidc.client-id}
 ----
 ====
 
-[[back-channel-logout]]
+[id="back-channel-logout"]
 ===== Back-channel logout
 
 The OIDC provider can force the logout of all applications by using the authentication data.
@@ -965,11 +971,11 @@ You will need to configure this URL in the admin console of your OIDC provider.
 You will also need to configure a token age property for the logout token verification to succeed if your OIDC provider does not set an expiry claim in the current logout token.
 For example, set `quarkus.oidc.token.age=10S` to ensure that no more than 10 seconds elapse since the logout token's `iat` (issued at) time.
 
-[[front-channel-logout]]
+[id="front-channel-logout"]
 ===== Front-channel logout
 
 You can use link:https://openid.net/specs/openid-connect-frontchannel-1_0.html[Front-channel logout] to log out the current user directly from the user agent, for example, its browser.
-It is similar to <<back-channel-logout,Back-channel logout>> but the logout steps are executed by the user agent, such as the browser, and not in the background by the OIDC provider.
+It is similar to xref:back-channel-logout[Back-channel logout] but the logout steps are executed by the user agent, such as the browser, and not in the background by the OIDC provider.
 This option is rarely used.
 
 You can configure Quarkus to support Front-channel logout as follows:
@@ -986,16 +992,16 @@ quarkus.oidc.logout.frontchannel.path=/front-channel-logout
 
 This path will be compared to the current request's path, and the user will be logged out if these paths match.
 
-[[local-logout]]
+[id="local-logout"]
 ===== Local logout
 
-<<user-initiated-logout,User-initiated logout>> will log the user out of the OIDC provider.
+xref:user-initiated-logout[User-initiated logout] will log the user out of the OIDC provider.
 If it is used as single sign-on, it might not be what you require.
 If, for example, your OIDC provider is Google, you will be logged out from Google and its services.
 Instead, the user might just want to log out of that specific application.
 Another use case might be when the OIDC provider does not have a logout endpoint.
 
-By using <<oidc-session,OidcSession>>, you can support a local logout, which means that only the local session cookie is cleared, as shown in the following example:
+By using xref:oidc-session[OidcSession], you can support a local logout, which means that only the local session cookie is cleared, as shown in the following example:
 
 [source,java]
 ----
@@ -1019,12 +1025,12 @@ public class ServiceResource {
     }
 ----
 
-[[oidc-session]]
+[id="oidc-session"]
 ====== Using `OidcSession` for local logout
 
-`io.quarkus.oidc.OidcSession` is a wrapper around the current `IdToken`, which can help to perform a <<local-logout,Local logout>>, retrieve the current session's tenant identifier, and check when the session will expire.
+`io.quarkus.oidc.OidcSession` is a wrapper around the current `IdToken`, which can help to perform a xref:local-logout[Local logout], retrieve the current session's tenant identifier, and check when the session will expire.
 More useful methods will be added to it over time.
-[[session-management]]
+[id="session-management"]
 
 ==== Session management
 
@@ -1037,7 +1043,7 @@ If set to `true`, when the current ID token expires, a refresh token grant will 
 
 [TIP]
 ====
-If you have a xref:security-oidc-bearer-token-authentication.adoc#single-page-applications[single page application for service applications] where your OIDC provider script such as `keycloak.js` is managing an authorization code flow, then that script will also control the SPA authentication session lifespan.
+If you have a link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication#single-page-applications[single page application for service applications] where your OIDC provider script such as `keycloak.js` is managing an authorization code flow, then that script will also control the SPA authentication session lifespan.
 ====
 
 If you work with a Quarkus OIDC `web-app` application, then the Quarkus OIDC code authentication mechanism manages the user session lifespan.
@@ -1081,7 +1087,7 @@ You cannot extend the user session indefinitely.
 The returning user with the expired ID token will have to re-authenticate at the OIDC provider endpoint once the refresh token has expired.
 ====
 
-[[oauth2]]
+[id="oauth2"]
 === Integration with GitHub and non-OIDC OAuth2 providers
 
 Some well-known providers such as GitHub or LinkedIn are not OpenID Connect providers, but OAuth2 providers that support the `authorization code flow`.
@@ -1095,7 +1101,7 @@ This `access` token represents an authenticated user authorizing the current Qua
 
 For OIDC, you validate the ID token as proof of authentication validity whereas in the case of OAuth2, you validate the access token.
 This is done by subsequently calling an endpoint that requires the access token and that typically returns user information.
-This approach is similar to the OIDC <<user-info,UserInfo>> approach, with `UserInfo` fetched by Quarkus OIDC on your behalf.
+This approach is similar to the OIDC xref:user-info_{context}[UserInfo] approach, with `UserInfo` fetched by Quarkus OIDC on your behalf.
 
 For example, when working with GitHub, the Quarkus endpoint can acquire an `access` token, which allows the Quarkus endpoint to request a GitHub profile for the current user.
 
@@ -1104,8 +1110,12 @@ To support the integration with such OAuth2 servers, `quarkus-oidc` needs to be 
 [NOTE]
 ====
 Even though you configure the extension to support the authorization code flows without `IdToken`, an internal `IdToken` is generated to standardize the way `quarkus-oidc` operates.
-You use an `IdToken` to support the authentication session and to avoid redirecting the user to the provider,  such as GitHub, on every request.
-In this case, the session lifespan is set to 5 minutes, which you can extend further as described in the <<session-management,session management>> section.
+You use an internal `IdToken` to support the authentication session and to avoid redirecting the user to the provider,  such as GitHub, on every request.
+In this case, the `IdToken` age is set to the value of a standard `expires_in` property in the authorization code flow response.
+You can use a `quarkus.oidc.authentication.internal-id-token-lifespan`property to customize the ID token age.
+The default ID token age is 5 minutes.
+
+, which you can extend further as described in the xref:session-management[session management] section.
 
 This simplifies how you handle an application that supports multiple OIDC providers.
 ====
@@ -1113,21 +1123,21 @@ This simplifies how you handle an application that supports multiple OIDC provid
 The next step is to ensure that the returned access token can be useful and is valid to the current Quarkus endpoint.
 The first way is to call the OAuth2 provider introspection endpoint by configuring `quarkus.oidc.introspection-path`, if the provider offers such an endpoint.
 In this case, you can use the access token as a source of roles using `quarkus.oidc.roles.source=accesstoken`.
-If no introspection endpoint is present, you can attempt instead to request <<user-info,UserInfo>> from the provider as it will at least validate the access token.
+If no introspection endpoint is present, you can attempt instead to request xref:user-info_{context}[UserInfo] from the provider as it will at least validate the access token.
 To do so, specify `quarkus.oidc.token.verify-access-token-with-user-info=true`.
 You also need to set the `quarkus.oidc.user-info-path` property to a URL endpoint that fetches the user info (or to an endpoint protected by the access token).
 For GitHub, since it does not have an introspection endpoint, requesting the UserInfo is required.
 
 [NOTE]
 ====
-Requiring <<user-info,UserInfo>> involves making a remote call on every request.
-Therefore, you might want to consider caching `UserInfo` data.
-For more information, see the xref:security-oidc-bearer-token-authentication.adoc#token-introspection-userinfo-cache[Token Introspection and UserInfo cache] section of the "OpenID Connect (OIDC) Bearer token authentication" guide.
+Requiring xref:user-info_{context}[UserInfo] involves making a remote call on every request.
 
-Alternatively, you might want to request that `UserInfo` is embedded into the internal generated `IdToken` with the `quarkus.oidc.cache-user-info-in-idtoken=true` property.
-The advantage of this approach is that, by default, no cached `UserInfo` state will be kept with the endpoint - instead it will be stored in a session cookie.
-You might also want to consider encrypting `IdToken` in this case if `UserInfo` contains sensitive data.
-For more information, see <<token-state-manager,Encrypt tokens with TokenStateManager>>.
+Therefore, `UserInfo` is embedded in the internal generated `IdToken` and saved in the encrypted session cookie. It can be disabled with `quarkus.oidc.cache-user-info-in-idtoken=false`.
+
+Alternatively, you might want to consider caching `UserInfo` using a default or custom UserInfo cache provider.
+For more information, see the link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication#token-introspection-userinfo-cache[Token Introspection and UserInfo cache] section of the "OpenID Connect (OIDC) Bearer token authentication" guide.
+
+Most well-known social OAuth2 providers enforce rate-limiting so there is a high chance you will prefer to have UserInfo cached.
 ====
 
 OAuth2 servers might not support a well-known configuration endpoint.
@@ -1154,7 +1164,7 @@ quarkus.oidc.credentials.secret=github_app_clientsecret
 # quarkus.oidc.cache-user-info-in-idtoken=true
 ----
 
-For more information about configuring other well-known providers, see xref:security-openid-connect-providers.adoc[OpenID Connect providers].
+For more information about configuring other well-known providers, see link:{quarkusio-guides}/security-openid-connect-providers[OpenID Connect providers].
 
 This is all that is needed for an endpoint like this one to return the currently-authenticated user's profile with `GET http://localhost:8080/github/userinfo` and access it as the individual `UserInfo` properties:
 
@@ -1184,7 +1194,7 @@ public class TokenResource {
 }
 ----
 
-If you support more than one social provider with the help of xref:security-openid-connect-multitenancy.adoc[OpenID Connect Multi-Tenancy], for example, Google, which is an OIDC provider that returns `IdToken`, and GitHub, which is an OAuth2 provider that does not return `IdToken` and only allows access to `UserInfo`, then you can have your endpoint working with only the injected `SecurityIdentity` for both Google and GitHub flows.
+If you support more than one social provider with the help of link:{default-url}/openid-connect-authentication/security-openid-connect-multitenancy[OpenID Connect Multi-Tenancy], for example, Google, which is an OIDC provider that returns `IdToken`, and GitHub, which is an OAuth2 provider that does not return `IdToken` and only allows access to `UserInfo`, then you can have your endpoint working with only the injected `SecurityIdentity` for both Google and GitHub flows.
 A simple augmentation of `SecurityIdentity` will be required where a principal created with the internally-generated `IdToken` will be replaced with the `UserInfo`-based principal when the GitHub flow is active:
 
 [source,java]
@@ -1268,7 +1278,7 @@ Possibly a simpler alternative is to inject both `@IdToken JsonWebToken` and `Us
 You must ensure that the callback path you enter in the GitHub OAuth application configuration matches the endpoint path where you want the user to be redirected after a successful GitHub authentication and application authorization.
 In this case, it has to be set to `http:localhost:8080/github/userinfo`.
 
-[[listen-to-authentication-events]]
+[id="listen-to-authentication-events"]
 === Listening to important authentication events
 
 You can register the `@ApplicationScoped` bean which will observe important OIDC authentication events.
@@ -1297,11 +1307,11 @@ public class SecurityEventListener {
 }
 ----
 
-TIP: You can listen to other security events as described in the xref:security-customization.adoc#observe-security-events[Observe security events] section of the Security Tips and Tricks guide.
+TIP: You can listen to other security events as described in the link:{quarkusio-guides}/security-customization#observe-security-events[Observe security events] section of the Security Tips and Tricks guide.
 
 === Propagating tokens to downstream services
 
-For information about Authorization Code Flow access token propagation to downstream services, see the xref:security-openid-connect-client-reference.adoc#token-propagation[Token Propagation] section.
+For information about Authorization Code Flow access token propagation to downstream services, see the link:{default-url}/openid-connect-authentication/security-openid-connect-client-reference#token-propagation[Token Propagation] section.
 
 
 == Integration considerations
@@ -1313,7 +1323,7 @@ This section discusses these considerations.
 
 === Single-page applications
 
-You can check if implementing single-page applications (SPAs) the way it is suggested in the xref:security-oidc-bearer-token-authentication.adoc#single-page-applications[Single-page applications] section of the "OpenID Connect (OIDC) Bearer token authentication" guide meets your requirements.
+You can check if implementing single-page applications (SPAs) the way it is suggested in the link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication#single-page-applications[Single-page applications] section of the "OpenID Connect (OIDC) Bearer token authentication" guide meets your requirements.
 
 If you prefer to use SPAs and JavaScript APIs such as `Fetch` or `XMLHttpRequest`(XHR) with Quarkus web applications, be aware that OIDC providers might not support cross-origin resource sharing (CORS) for authorization endpoints where the users are authenticated after a redirect from Quarkus.
 This will lead to authentication failures if the Quarkus application and the OIDC provider are hosted on different HTTP domains, ports, or both.
@@ -1365,7 +1375,7 @@ Future<void> callQuarkusService() async {
 === Cross-origin resource sharing
 
 If you plan to consume this application from a single-page application running on a different domain, you need to configure cross-origin resource sharing (CORS).
-For more information, see the xref:security-cors.adoc#cors-filter[CORS filter] section of the "Cross-origin resource sharing" guide.
+For more information, see the link:{quarkusio-guides}/security-cors#cors-filter[CORS filter] section of the "Cross-origin resource sharing" guide.
 
 === Calling Cloud provider services
 
@@ -1377,8 +1387,10 @@ You can do so by using https://github.com/quarkiverse[Quarkiverse] https://githu
 You need only to add
 the https://github.com/quarkiverse/quarkiverse-google-cloud-services/releases/latest[latest tag] service dependency as shown in the following example:
 
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
     <groupId>io.quarkiverse.googlecloudservices</groupId>
@@ -1386,12 +1398,16 @@ the https://github.com/quarkiverse/quarkiverse-google-cloud-services/releases/la
     <version>${quarkiverse.googlecloudservices.version}</version>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 implementation("io.quarkiverse.googlecloudservices:quarkus-google-cloud-bigquery:${quarkiverse.googlecloudservices.version}")
 ----
+--
 
 Then, configure Google OIDC properties:
 
@@ -1409,7 +1425,7 @@ The OIDC authentication mechanism can be affected if your Quarkus application is
 For example, an authorization code flow `redirect_uri` parameter might be set to the internal host instead of the expected external one.
 
 In such cases, configuring Quarkus to recognize the original headers forwarded by the proxy will be required.
-For more information, see the xref:http-reference.adoc#reverse-proxy[Running behind a reverse proxy] Vert.x documentation section.
+For more information, see the link:{quarkusio-guides}/http-reference#reverse-proxy[Running behind a reverse proxy] Vert.x documentation section.
 
 For example, if your Quarkus endpoint runs in a cluster behind Kubernetes Ingress, then a redirect from the OIDC provider back to this endpoint might not work because the calculated `redirect_uri` parameter might point to the internal endpoint address.
 You can resolve this problem by using the following configuration, where `X-ORIGINAL-HOST` is set by Kubernetes Ingress to represent the external endpoint address.:
@@ -1432,7 +1448,7 @@ In such cases, the endpoint might report an issuer verification failure and redi
 If you work with Keycloak, then start it with a `KEYCLOAK_FRONTEND_URL` system property set to the externally-accessible base URL.
 If you work with other OIDC providers, check the documentation of your provider.
 
-[[oidc-saml-broker]]
+[id="oidc-saml-broker"]
 == OIDC SAML identity broker
 
 If your identity provider does not implement OpenID Connect but only the legacy XML-based SAML2.0 SSO protocol, then Quarkus cannot be used as a SAML 2.0 adapter, similarly to how `quarkus-oidc` is used as an OIDC adapter.
@@ -1486,7 +1502,7 @@ Then, you are ready to start authenticating your Quarkus users to the Okta SAML 
 
 You can configure other OIDC providers to provide a SAML bridge similarly to how it can be done for Keycloak.
 
-[[integration-testing]]
+[id="integration-testing_{context}"]
 == Testing
 
 Testing is often tricky when it comes to authentication to a separate OIDC-like server.
@@ -1494,8 +1510,10 @@ Quarkus offers several options from mocking to a local run of an OIDC provider.
 
 Start by adding the following dependencies to your test project:
 
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
     <groupId>net.sourceforge.htmlunit</groupId>
@@ -1514,22 +1532,28 @@ Start by adding the following dependencies to your test project:
     <scope>test</scope>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 testImplementation("net.sourceforge.htmlunit:htmlunit")
 testImplementation("io.quarkus:quarkus-junit5")
 ----
+--
 
 ifndef::no-deprecated-test-resource[]
-[[integration-testing-wiremock]]
+[id="integration-testing-wiremock_{context}"]
 === Wiremock
 
 Add the following dependency:
 
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
     <groupId>io.quarkus</groupId>
@@ -1537,12 +1561,16 @@ Add the following dependency:
     <scope>test</scope>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 testImplementation("io.quarkus:quarkus-test-oidc-server")
 ----
+--
 
 Prepare the REST test endpoints and set `application.properties`.
 For example:
@@ -1611,10 +1639,10 @@ Additionally, `OidcWiremockTestResource` sets the token issuer and audience to `
 `OidcWiremockTestResource` can be used to emulate all OIDC providers.
 endif::no-deprecated-test-resource[]
 
-[[integration-testing-keycloak-devservices]]
+[id="integration-testing-keycloak-devservices_{context}"]
 === Dev Services for Keycloak
 
-Using xref:security-openid-connect-dev-services.adoc[Dev Services for Keycloak] is recommended for integration testing against Keycloak.
+Using link:{quarkusio-guides}/security-openid-connect-dev-services[Dev Services for Keycloak] is recommended for integration testing against Keycloak.
 `Dev Services for Keycloak` will start and initialize a test container: it will create a `quarkus` realm, a `quarkus-app` client (`secret` secret), and add `alice` (`admin` and `user` roles) and `bob` (`user` role) users, where all of these properties can be customized.
 
 First, prepare `application.properties`.
@@ -1636,7 +1664,7 @@ If a custom realm file has to be imported into Keycloak before running the tests
 quarkus.keycloak.devservices.realm-path=quarkus-realm.json
 ----
 
-Finally, write a test code the same way as it is described in the <<integration-testing-wiremock,Wiremock>> section.
+Finally, write a test code the same way as it is described in the xref:integration-testing-wiremock_{context}[Wiremock] section.
 The only difference is that `@QuarkusTestResource` is no longer needed:
 
 [source, java]
@@ -1647,16 +1675,18 @@ public class CodeFlowAuthorizationTest {
 ----
 
 ifndef::no-deprecated-test-resource[]
-[[integration-testing-keycloak]]
+[id="integration-testing-keycloak_{context}"]
 === Using KeycloakTestResourceLifecycleManager
 
 Use `KeycloakTestResourceLifecycleManager` for your tests only if there is a good reason not to use `Dev Services for Keycloak`.
-If you need to do the integration testing against Keycloak then you are encouraged to do it with <<integration-testing-keycloak-devservices,Dev Services for Keycloak>>.
+If you need to do the integration testing against Keycloak then you are encouraged to do it with xref:integration-testing-keycloak-devservices_{context}[Dev Services for Keycloak].
 
 First, add the following dependency:
 
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
     <groupId>io.quarkus</groupId>
@@ -1664,12 +1694,16 @@ First, add the following dependency:
     <scope>test</scope>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 testImplementation("io.quarkus:quarkus-test-keycloak-server")
 ----
+--
 
 This provides `io.quarkus.test.keycloak.server.KeycloakTestResourceLifecycleManager` - an implementation of `io.quarkus.test.common.QuarkusTestResourceLifecycleManager` which starts a Keycloak container.
 
@@ -1692,7 +1726,7 @@ Then, configure the Maven Surefire plugin as follows (and similarly the Maven Fa
 </plugin>
 ----
 
-Now, set the configuration and write the test code the same way as it is described in the <<integration-testing-wiremock,Wiremock>> section.
+Now, set the configuration and write the test code the same way as it is described in the xref:integration-testing-wiremock_{context}[Wiremock] section.
 The only difference is the name of `QuarkusTestResource`:
 
 [source, java]
@@ -1713,7 +1747,7 @@ By default, `KeycloakTestResourceLifecycleManager` uses HTTPS to initialize a Ke
 The default realm name is `quarkus` and client id is `quarkus-web-app` - set `keycloak.realm` and `keycloak.web-app.client` system properties to customize the values if needed.
 endif::no-deprecated-test-resource[]
 
-[[integration-testing-security-annotation]]
+[id="integration-testing-security-annotation_{context}"]
 === TestSecurity annotation
 
 You can use @TestSecurity and @OidcSecurity annotations to test the `web-app` application endpoint code, which depends on either one of the following injections, or all four:
@@ -1723,7 +1757,7 @@ You can use @TestSecurity and @OidcSecurity annotations to test the `web-app` ap
 * `UserInfo`
 * `OidcConfigurationMetadata`
 
-For more information, see xref:security-oidc-bearer-token-authentication.adoc#integration-testing-security-annotation[Use TestingSecurity with injected JsonWebToken].
+For more information, see link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication#integration-testing-security-annotation[Use TestingSecurity with injected JsonWebToken].
 
 === Checking errors in the logs
 
@@ -1747,13 +1781,13 @@ From the `quarkus dev` console, type `j` to change the application global log le
 
 == References
 
-* xref:security-oidc-configuration-properties-reference.adoc[OIDC configuration properties]
-* xref:security-openid-connect-providers.adoc[Configuring well-known OpenID Connect providers]
-* xref:security-openid-connect-client-reference.adoc[OpenID Connect and OAuth2 client and filters reference guide]
-* xref:security-openid-connect-dev-services.adoc[Dev Services for Keycloak]
-* xref:security-authentication-mechanisms.adoc#oidc-jwt-oauth2-comparison[Choosing between OpenID Connect, SmallRye JWT, and OAuth2 authentication mechanisms]
-* xref:security-authentication-mechanisms.adoc#combining-authentication-mechanisms[Combining authentication mechanisms]
-* xref:security-overview.adoc[Quarkus Security overview]
+* link:{default-url}/openid-connect-authentication/security-oidc-configuration-properties-reference[OIDC configuration properties]
+* link:{quarkusio-guides}/security-openid-connect-providers[Configuring well-known OpenID Connect providers]
+* link:{default-url}/openid-connect-authentication/security-openid-connect-client-reference[OpenID Connect and OAuth2 client and filters reference guide]
+* link:{quarkusio-guides}/security-openid-connect-dev-services[Dev Services for Keycloak]
+* link:{default-url}/security-architecture/security-authentication-mechanisms#oidc-jwt-oauth2-comparison[Choosing between OpenID Connect, SmallRye JWT, and OAuth2 authentication mechanisms]
+* link:{default-url}/security-architecture/security-authentication-mechanisms#combining-authentication-mechanisms[Combining authentication mechanisms]
+* link:{default-url}/security-overview/security-overview[Quarkus Security overview]
 * https://www.keycloak.org/documentation.html[Keycloak documentation]
 * https://openid.net/connect/[OpenID Connect]
 * https://tools.ietf.org/html/rfc7519[JSON Web Token]
