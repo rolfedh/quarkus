@@ -39,11 +39,11 @@ Then, you can subscribe to the resulting `Uni` to be notified when authenticatio
 
 [NOTE]
 ====
-You can still access `SecurityIdentity` synchronously with `public SecurityIdentity getIdentity()` in xref:resteasy-reactive.adoc[RESTEasy Reactive] from endpoints that are annotated with `@RolesAllowed`, `@Authenticated`, or with respective configuration authorization checks because authentication has already happened.
-The same is also valid for xref:reactive-routes.adoc[Reactive routes] if a route response is synchronous.
+You can still access `SecurityIdentity` synchronously with `public SecurityIdentity getIdentity()` in link:{quarkusio-guides}/rest[Quarkus REST (formerly RESTEasy Reactive)] from endpoints that are annotated with `@RolesAllowed`, `@Authenticated`, or with respective configuration authorization checks because authentication has already happened.
+The same is also valid for link:{quarkusio-guides}/reactive-routes[Reactive routes] if a route response is synchronous.
 ====
 
-When proactive authentication is disabled, xref:security-authorize-web-endpoints-reference.adoc#standard-security-annotations[standard security annotations] used on CDI beans do not function on an I/O thread if a secured method that is not void synchronously returns a value.
+When proactive authentication is disabled, link:{default-url}/authorization/security-authorize-web-endpoints-reference#standard-security-annotations[standard security annotations] used on CDI beans do not function on an I/O thread if a secured method that is not void synchronously returns a value.
 This limitation arises from the necessity for these methods to access `SecurityIdentity`.
 
 The following example defines `HelloResource` and `HelloService`.
@@ -96,7 +96,7 @@ public class HelloService {
 }
 ----
 
-[[customize-auth-exception-responses]]
+[id="customize-auth-exception-responses"]
 == Customize authentication exception responses
 
 You can use Jakarta REST `ExceptionMapper` to capture Quarkus Security authentication exceptions such as `io.quarkus.security.AuthenticationFailedException`.
@@ -167,7 +167,7 @@ public class AuthenticationFailedExceptionHandler {
 
 == References
 
-* xref:security-overview.adoc[Quarkus Security overview]
-* xref:security-architecture.adoc[Quarkus Security architecture]
-* xref:security-authentication-mechanisms.adoc[Authentication mechanisms in Quarkus]
-* xref:security-identity-providers.adoc[Identity providers]
+* link:{default-url}/security-overview/security-overview[Quarkus Security overview]
+* link:{default-url}/security-architecture/security-architecture[Quarkus Security architecture]
+* link:{default-url}/security-architecture/security-authentication-mechanisms[Authentication mechanisms in Quarkus]
+* link:{default-url}/security-architecture/security-identity-providers[Identity providers]

@@ -14,7 +14,7 @@ Read about the use of logging API in Quarkus, configuring logging output, and us
 
 Quarkus uses the JBoss Log Manager logging backend for publishing application and framework logs.
 Quarkus supports the JBoss Logging API and multiple other logging APIs, seamlessly integrated with JBoss Log Manager.
-You can use any of the <<logging-apis,following APIs>>:
+You can use any of the xref:logging-apis[following APIs]:
 
 * link:https://github.com/jboss-logging/jboss-logging[JBoss Logging]
 * link:https://docs.oracle.com/en/java/javase/17/docs/api/java.logging/java/util/logging/package-summary.html[JDK `java.util.logging` (JUL)]
@@ -53,22 +53,22 @@ public class ExampleResource {
 ----
 
 NOTE: While JBoss Logging routes log messages into JBoss Log Manager directly, one of your libraries might rely on a different logging API.
-In such cases, you need to use a <<logging-apis,logging adapter>> to ensure that its log messages are routed to JBoss Log Manager as well.
+In such cases, you need to use a xref:logging-apis[logging adapter] to ensure that its log messages are routed to JBoss Log Manager as well.
 
 == Get an application logger
 
 In Quarkus, the most common ways to obtain an application logger are by:
 
-* <<declaring-a-logger-field>>
-* <<simplified-logging>>
-* <<injection-of-a-configured-logger>>
+* xref:declaring-a-logger-field[Declaring a logger field]
+* xref:simplified-logging[Simplified logging]
+* xref:injection-of-a-configured-logger[Injecting a configured logger]
 
 [[declaring-a-logger-field]]
 === Declaring a logger field
 
 With this classic approach, you use a specific API to obtain a logger instance, store it in a static field of a class, and call logging operations upon this instance.
 
-The same flow can be applied with any of the <<logging-apis,supported logging APIs>>.
+The same flow can be applied with any of the xref:logging-apis[supported logging APIs].
 
 .An example of storing a logger instance into a static field by using the JBoss Logging API:
 [source,java]
@@ -206,7 +206,7 @@ FINEST:: Increased debug output compared to `TRACE`, which might have a higher f
 
 == Configure the log level, category, and format
 
-JBoss Logging, integrated into Quarkus, offers a unified configuration for all <<logging-apis,supported logging APIs>> through a single configuration file that sets up all available extensions.
+JBoss Logging, integrated into Quarkus, offers a unified configuration for all xref:logging-apis[supported logging APIs] through a single configuration file that sets up all available extensions.
 To adjust runtime logging, modify the `application.properties` file.
 
 .An example of how you can set the default log level to `INFO` logging and include Hibernate `DEBUG` logs:
@@ -239,7 +239,7 @@ If you add these properties on the command line, ensure the `"` character is esc
 ----
 ====
 
-All potential properties are listed in the <<loggingConfigurationReference,logging configuration reference>> section.
+All potential properties are listed in the xref:loggingConfigurationReference[logging configuration reference] section.
 
 
 === Logging categories
@@ -272,13 +272,13 @@ quarkus.log.category."org.apache.kafka.common.utils".level=INFO
 This example shows how you can configure the minimal log level on the categories `org.apache.kafka.clients` and `org.apache.kafka.common.utils`.
 ====
 
-For more information, see <<loggingConfigurationReference>>.
+For more information, see xref:loggingConfigurationReference[Logging configuration reference].
 
 If you want to configure something extra for a specific category, create a named handler like `quarkus.log.handler.[console|file|syslog].<your-handler-name>.*` and set it up for that category by using `quarkus.log.category.<my-category>.handlers`.
 
 An example use case can be a desire to use a different timestamp format for log messages which are saved to a file than the format used for other handlers.
 
-For further demonstration, see the outputs of the <<category-named-handlers-example,Attaching named handlers to a category>> example.
+For further demonstration, see the outputs of the xref:category-named-handlers-example[Attaching named handlers to a category] example.
 
 [cols="<m,<m,<2",options="header"]
 |===
@@ -622,7 +622,7 @@ quarkus.log.handlers=CONSOLE_MIRROR
 
 Use a centralized location to efficiently collect, store, and analyze log data from various components and instances of the application.
 
-To send logs to a centralized tool such as Graylog, Logstash, or Fluentd, see the Quarkus xref:centralized-log-management.adoc[Centralized log management] guide.
+To send logs to a centralized tool such as Graylog, Logstash, or Fluentd, see the Quarkus link:{quarkusio-guides}/centralized-log-management[Centralized log management] guide.
 
 
 == Configure logging for `@QuarkusTest`
@@ -662,7 +662,7 @@ test {
 }
 ----
 
-See also <<getting-started-testing.adoc#test-from-ide,Running `@QuarkusTest` from an IDE>>.
+See also link:{quarkusio-guides}/getting-started-testing#test-from-ide[Running `@QuarkusTest` from an IDE].
 
 [[logging-apis]]
 == Use other logging APIs

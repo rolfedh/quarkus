@@ -17,10 +17,10 @@ include::{generated-dir}/config/quarkus-oidc.adoc[opts=optional, leveloffset=+1]
 
 == References
 
-* xref:security-oidc-bearer-token-authentication.adoc[OIDC Bearer token authentication]
-* xref:security-oidc-bearer-token-authentication-tutorial.adoc[Protect a service application by using OpenID Connect (OIDC) Bearer token authentication]
+* link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OIDC Bearer token authentication]
+* link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication-tutorial[Protect a service application by using OpenID Connect (OIDC) Bearer token authentication]
 * https://openid.net/connect/[OpenID Connect]
-* xref:security-openid-connect-client-reference.adoc[OpenID Connect and OAuth2 Client and Filters Reference Guide]
-* xref:security-authentication-mechanisms.adoc#oidc-jwt-oauth2-comparison[Choosing between OpenID Connect, SmallRye JWT, and OAuth2 authentication mechanisms]
-* xref:security-authentication-mechanisms.adoc#combining-authentication-mechanisms[Combining authentication mechanisms]
-* xref:security-overview.adoc[Quarkus Security]
+* link:{default-url}/openid-connect-authentication/security-openid-connect-client-reference[OpenID Connect and OAuth2 Client and Filters Reference Guide]
+* link:{default-url}/security-architecture/security-authentication-mechanisms#oidc-jwt-oauth2-comparison[Choosing between OpenID Connect, SmallRye JWT, and OAuth2 authentication mechanisms]
+* link:{default-url}/security-architecture/security-authentication-mechanisms#combining-authentication-mechanisms[Combining authentication mechanisms]
+* link:{default-url}/security-overview/security-overview[Quarkus Security]

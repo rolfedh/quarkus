@@ -14,9 +14,9 @@ Learn how to use OpenID Connect (OIDC) and OAuth2 clients with filters to get, r
 
 This approach uses an OIDC token propagation Reactive filter to propagate the incoming bearer access tokens.
 
-For more information about `Oidc Client` and `Token Propagation` support in Quarkus, see the xref:security-openid-connect-client-reference.adoc[OpenID Connect (OIDC) and OAuth2 client and filters reference guide].
+For more information about `Oidc Client` and `Token Propagation` support in Quarkus, see the link:{default-url}/openid-connect-authentication/security-openid-connect-client-reference[OpenID Connect (OIDC) and OAuth2 client and filters reference guide].
 
-To protect your applications by using Bearer Token Authorization, see the xref:security-oidc-bearer-token-authentication.adoc[OpenID Connect (OIDC) Bearer token authentication] guide.
+To protect your applications by using Bearer Token Authorization, see the link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OpenID Connect (OIDC) Bearer token authentication] guide.
 
 == Prerequisites
 
@@ -377,12 +377,20 @@ This configuration references Keycloak, which is used by `ProtectedResource` to 
 Both REST clients point to `ProtectedResource`'s HTTP address.
 
 NOTE: Adding a `%prod.` profile prefix to `quarkus.oidc.auth-server-url` ensures that `Dev Services for Keycloak` launches a container for you when the application is run in dev or test modes.
-For more information, see the <<keycloak-dev-mode,Running the application in dev mode>> section.
+<<<<<<< Updated upstream
+For more information, see the xref:keycloak-dev-mode[Running the application in dev mode] section.
+=======
+For more information, see the xref:keycloak-dev-mode_{context}[Running the application in dev mode] section.
+>>>>>>> Stashed changes
 
 == Starting and configuring the Keycloak server
 
 NOTE: Do not start the Keycloak server when you run the application in dev or test modes; `Dev Services for Keycloak` launches a container.
-For more information, see the <<keycloak-dev-mode,Running the application in dev mode>> section.
+<<<<<<< Updated upstream
+For more information, see the xref:keycloak-dev-mode[Running the application in dev mode] section.
+=======
+For more information, see the xref:keycloak-dev-mode_{context}[Running the application in dev mode] section.
+>>>>>>> Stashed changes
 Ensure you put the link:{quickstarts-tree-url}/security-openid-connect-client-quickstart/config/quarkus-realm.json[realm configuration file] on the classpath, in the `target/classes` directory.
 This placement ensures that the file is automatically imported in dev mode.
 However, if you have already built a link:{quickstarts-tree-url}/security-openid-connect-quickstart[complete solution], you do not need to add the realm file to the classpath because the build process has already done so.
@@ -408,16 +416,16 @@ This `quarkus` realm file adds a `frontend` client, and `alice` and `admin` user
 `alice` has a `user` role.
 `admin` has both `user` and `admin` roles.
 
-[[keycloak-dev-mode]]
+[id="keycloak-dev-mode_{context}"]
 == Running the application in dev mode
 
 To run the application in a dev mode, use:
 
 include::{includes}/devtools/dev.adoc[]
 
-xref:security-openid-connect-dev-services.adoc[Dev Services for Keycloak] launches a Keycloak container and imports `quarkus-realm.json`.
+link:{quarkusio-guides}/security-openid-connect-dev-services[Dev Services for Keycloak] launches a Keycloak container and imports `quarkus-realm.json`.
 
-Open a xref:dev-ui.adoc[Dev UI] available at http://localhost:8080/q/dev-ui[/q/dev-ui] and click a `Provider: Keycloak` link in the *OpenID Connect Dev UI* card.
+Open a link:{quarkusio-guides}/dev-ui[Dev UI] available at http://localhost:8080/q/dev-ui[/q/dev-ui] and click a `Provider: Keycloak` link in the *OpenID Connect Dev UI* card.
 
 When asked, log in to a `Single Page Application` provided by the OpenID Connect Dev UI:
 
@@ -469,7 +477,11 @@ After a little while, when the build finishes, you can run the native binary dir
 
 == Testing the application
 
-For more information about testing your application in dev mode, see the preceding <<keycloak-dev-mode,Running the application in dev mode>> section.
+<<<<<<< Updated upstream
+For more information about testing your application in dev mode, see the preceding xref:keycloak-dev-mode[Running the application in dev mode] section.
+=======
+For more information about testing your application in dev mode, see the preceding xref:keycloak-dev-mode_{context}[Running the application in dev mode] section.
+>>>>>>> Stashed changes
 
 You can test the application launched in JVM or Native modes with `curl`.
 
@@ -562,6 +574,6 @@ In contrast with the preceding command, this command returns a `403` status code
 
 == References
 
-* xref:security-openid-connect-client-reference.adoc[OpenID Connect Client and Token Propagation Reference Guide]
-* xref:security-oidc-bearer-token-authentication.adoc[OIDC Bearer token authentication]
-* xref:security-overview.adoc[Quarkus Security overview]
+* link:{default-url}/openid-connect-authentication/security-openid-connect-client-reference[OpenID Connect Client and Token Propagation Reference Guide]
+* link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OIDC Bearer token authentication]
+* link:{default-url}/security-overview/security-overview[Quarkus Security overview]

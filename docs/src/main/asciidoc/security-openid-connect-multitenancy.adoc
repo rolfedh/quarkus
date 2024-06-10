@@ -17,11 +17,11 @@ These tenants can be distinct realms or security domains within the same OIDC pr
 Each customer functions as a distinct tenant when serving multiple customers from the same application, such as in a SaaS environment.
 By enabling multitenancy support to your applications, you can support distinct authentication policies for each tenant, even authenticating against different OIDC providers, such as Keycloak and Google.
 
-To authorize a tenant by using Bearer Token Authorization, see the xref:security-oidc-bearer-token-authentication.adoc[OpenID Connect (OIDC) Bearer token authentication] guide.
+To authorize a tenant by using Bearer Token Authorization, see the link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OpenID Connect (OIDC) Bearer token authentication] guide.
 
-To authenticate and authorize a tenant by using the OIDC authorization code flow, read the xref:security-oidc-code-flow-authentication.adoc[OpenID Connect authorization code flow mechanism for protecting web applications] guide.
+To authenticate and authorize a tenant by using the OIDC authorization code flow, read the link:{default-url}/openid-connect-authentication/security-oidc-code-flow-authentication[OpenID Connect authorization code flow mechanism for protecting web applications] guide.
 
-Also, see the xref:security-oidc-configuration-properties-reference.adoc[OpenID Connect (OIDC) configuration properties] reference guide.
+Also, see the link:{default-url}/openid-connect-authentication/security-oidc-configuration-properties-reference[OpenID Connect (OIDC) configuration properties] reference guide.
 
 == Prerequisites
 
@@ -65,20 +65,26 @@ include::{includes}/devtools/extension-add.adoc[]
 
 This adds the following to your build file:
 
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
     <groupId>io.quarkus</groupId>
     <artifactId>quarkus-oidc</artifactId>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 implementation("io.quarkus:quarkus-oidc")
 ----
+--
 
 == Writing the application
 
@@ -324,7 +330,7 @@ A similar technique can be used with `TenantConfigResolver`, where a `tenant-id`
 
 [NOTE]
 ====
-If you also use xref:hibernate-orm.adoc#multitenancy[Hibernate ORM multitenancy] or xref:mongodb-panache.adoc#multitenancy[MongoDB with Panache multitenancy] and both tenant ids are the same
+If you also use link:{quarkusio-guides}/hibernate-orm#multitenancy[Hibernate ORM multitenancy] or link:{quarkusio-guides}/mongodb-panache#multitenancy[MongoDB with Panache multitenancy] and both tenant ids are the same
 and must be extracted from the Vert.x `RoutingContext`, you can pass the tenant id from the OIDC Tenant Resolver to the Hibernate ORM Tenant Resolver or MongoDB with Panache Mongo Database Resolver
 as a `RoutingContext` attribute, for example:
 
@@ -413,13 +419,15 @@ After a little while, you can run this binary directly:
 ifndef::no-deprecated-test-resource[]
 === Use Dev Services for Keycloak
 
-xref:security-openid-connect-dev-services.adoc[Dev Services for Keycloak] is recommended for the integration testing against Keycloak.
+link:{quarkusio-guides}/security-openid-connect-dev-services[Dev Services for Keycloak] is recommended for the integration testing against Keycloak.
 Dev Services for Keycloak launches and initializes a test container: it imports configured realms and sets a base Keycloak URL for the `CustomTenantResolver` to calculate a realm-specific URL.
 
 First, add the following dependencies:
 
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
     <groupId>io.quarkus</groupId>
@@ -437,14 +445,18 @@ First, add the following dependencies:
     <scope>test</scope>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 testImplementation("io.quarkus:quarkus-test-keycloak-server")
 testImplementation("io.rest-assured:rest-assured")
 testImplementation("net.sourceforge.htmlunit:htmlunit")
 ----
+--
 
 `quarkus-test-keycloak-server` provides a utility class `io.quarkus.test.keycloak.client.KeycloakTestClient` for acquiring the realm specific access tokens and which you can use with `RestAssured` for testing the `/{tenant}/bearer` endpoint expecting bearer access tokens.
 `HtmlUnit` tests the `/{tenant}` endpoint and the authorization code flow.
@@ -562,7 +574,7 @@ public class CodeFlowIT extends CodeFlowTest {
 }
 ----
 
-For more information about how it is initialized and configured, see xref:security-openid-connect-dev-services.adoc[Dev Services for Keycloak].
+For more information about how it is initialized and configured, see link:{quarkusio-guides}/security-openid-connect-dev-services[Dev Services for Keycloak].
 endif::no-deprecated-test-resource[]
 
 === Use the browser
@@ -592,21 +604,21 @@ However, this time, you are going to authenticate by using a different realm.
 In both cases, the landing page shows the user's name and email if the user is successfully authenticated.
 Although `alice` exists in both tenants, the application treats them as distinct users in separate realms.
 
-[[static-tenant-resolution]]
-== Static tenant configuration resolution
+[id="static-tenant-resolution"]
+=== Static tenant configuration resolution
 
 When you set multiple tenant configurations in the `application.properties` file, you only need to specify how the tenant identifier gets resolved.
 To configure the resolution of the tenant identifier, use one of the following options:
 
-* <<tenant-resolver>>
-* <<default-tenant-resolver>>
-* <<annotations-tenant-resolver>>
+* xref:tenant-resolver[Resolve with `TenantResolver`]
+* xref:default-tenant-resolver[Use last request path segment as tenant id]
+* xref:annotations-tenant-resolver[Resolve tenants with a token issuer claim]
 
 These tenant resolution options are tried in the order they are listed until the tenant id gets resolved.
 If the tenant id remains unresolved (`null`), the default (unnamed) tenant configuration is selected.
 
-[[tenant-resolver]]
-=== Resolve with `TenantResolver`
+[id="tenant-resolver"]
+==== Resolve with `TenantResolver`
 
 The following `application.properties` example shows how you can resolve the tenant identifier of two tenants named `a` and `b` by using the `TenantResolver` method:
 
@@ -648,7 +660,7 @@ public class CustomTenantResolver implements TenantResolver {
 
 In this example, the value of the last request path segment is a tenant id, but if required, you can implement a more complex tenant identifier resolution logic.
 
-[[default-tenant-resolver]]
+[id="default-tenant-resolver"]
 === Default resolution
 
 The default resolution for a tenant identifier is convention based, whereby the authentication request must include the tenant identifier in the last segment of the request path.
@@ -688,7 +700,7 @@ Therefore, authenticated users can access the secured application area without r
 Default resolution can also work for Bearer token authentication.
 Still, it might be less practical because a tenant identifier must always be set as the last path segment value.
 
-[[annotations-tenant-resolver]]
+[id="annotations-tenant-resolver"]
 === Resolve with annotations
 
 You can use the `io.quarkus.oidc.Tenant` annotation for resolving the tenant identifiers as an alternative to using `io.quarkus.oidc.TenantResolver`.
@@ -696,7 +708,7 @@ You can use the `io.quarkus.oidc.Tenant` annotation for resolving the tenant ide
 [NOTE]
 ====
 Proactive HTTP authentication must be disabled (`quarkus.http.auth.proactive=false`) for this to work.
-For more information, see the xref:security-proactive-authentication.adoc[Proactive authentication] guide.
+For more information, see the link:{default-url}/security-architecture/security-proactive-authentication[Proactive authentication] guide.
 ====
 
 Assuming your application supports two OIDC tenants, the `hr` and default tenants, all resource methods and classes carrying `@Tenant("hr")` are authenticated by using the OIDC provider configured by `quarkus.oidc.hr.auth-server-url`.
@@ -726,7 +738,7 @@ public class HelloResource {
 ----
 <1> The `io.quarkus.oidc.Tenant` annotation must be placed on either the resource class or resource method.
 
-[[tenant-config-resolver]]
+[id="tenant-config-resolver"]
 == Dynamic tenant configuration resolution
 
 If you need a more dynamic configuration for the different tenants you want to support and don't want to end up with multiple
@@ -851,7 +863,7 @@ public class CustomTenantResolver implements TenantResolver {
 }
 ----
 
-[[disable-tenant]]
+[id="disable-tenant"]
 == Disabling tenant configurations
 
 Custom `TenantResolver` and `TenantConfigResolver` implementations might return `null` if no tenant can be inferred from the current request and a fallback to the default tenant configuration is required.
@@ -869,9 +881,9 @@ Be aware that tenant-specific configurations can also be disabled, for example: 
 
 == References
 
-* xref:security-oidc-configuration-properties-reference.adoc[OIDC configuration properties]
+* link:{default-url}/openid-connect-authentication/security-oidc-configuration-properties-reference[OIDC configuration properties]
 * https://www.keycloak.org/documentation.html[Keycloak Documentation]
 * https://openid.net/connect/[OpenID Connect]
 * https://tools.ietf.org/html/rfc7519[JSON Web Token]
 * https://developers.google.com/identity/protocols/OpenIDConnect[Google OpenID Connect]
-* xref:security-overview.adoc[Quarkus Security overview]
+* link:{default-url}/security-overview/security-overview[Quarkus Security overview]

@@ -15,9 +15,9 @@ include::_attributes.adoc[]
 Use the Quarkus OpenID Connect (OIDC) extension to secure a Jakarta REST application with Bearer token authentication.
 The bearer tokens are issued by OIDC and OAuth 2.0 compliant authorization servers, such as link:https://www.keycloak.org[Keycloak].
 
-For more information about OIDC Bearer token authentication, see the Quarkus xref:security-oidc-bearer-token-authentication.adoc[OpenID Connect (OIDC) Bearer token authentication] guide.
+For more information about OIDC Bearer token authentication, see the Quarkus link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OpenID Connect (OIDC) Bearer token authentication] guide.
 
-If you want to protect web applications by using OIDC Authorization Code Flow authentication, see the xref:security-oidc-code-flow-authentication.adoc[OpenID Connect authorization code flow mechanism for protecting web applications] guide.
+If you want to protect web applications by using OIDC Authorization Code Flow authentication, see the link:{default-url}/openid-connect-authentication/security-oidc-code-flow-authentication[OpenID Connect authorization code flow mechanism for protecting web applications] guide.
 
 == Prerequisites
 
@@ -74,20 +74,26 @@ include::{includes}/devtools/extension-add.adoc[]
 
 This will add the following to your build file:
 
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
    <groupId>io.quarkus</groupId>
    <artifactId>quarkus-oidc</artifactId>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 implementation("io.quarkus:quarkus-oidc")
 ----
+--
 
 == Write the application
 
@@ -190,12 +196,12 @@ Where:
 
 * `%prod.quarkus.oidc.auth-server-url` sets the base URL of the OpenID Connect (OIDC) server.
 The `%prod.` profile prefix ensures that `Dev Services for Keycloak` launches a container when you run the application in development (dev) mode.
-For more information, see the <<keycloak-dev-mode>> section.
+For more information, see the xref:keycloak-dev-mode_{context}[Run the application in dev mode] section.
 
 * `quarkus.oidc.client-id` sets a client id that identifies the application.
 * `quarkus.oidc.credentials.secret` sets the client secret, which is used by the `client_secret_basic` authentication method.
 
-For more information, see the Quarkus xref:security-oidc-configuration-properties-reference.adoc[OpenID Connect (OIDC) configuration properties] guide.
+For more information, see the Quarkus link:{default-url}/openid-connect-authentication/security-oidc-configuration-properties-reference[OpenID Connect (OIDC) configuration properties] guide.
 
 
 == Start and configure the Keycloak server
@@ -206,7 +212,7 @@ You do not need to do this if you have already built a link:{quickstarts-tree-ur
 [NOTE]
 ====
 Do not start the Keycloak server when you run the application in dev mode; `Dev Services for Keycloak` will start a container.
-For more information, see the <<keycloak-dev-mode>> section.
+For more information, see the xref:keycloak-dev-mode_{context}[Run the application in dev mode] section.
 ====
 +
 . To start a Keycloak server, you can use Docker to run the following command:
@@ -232,13 +238,13 @@ ifndef::no-quarkus-keycloak-admin-client[]
 [NOTE]
 ====
 If you want to use the Keycloak Admin Client to configure your server from your application, you need to include either the `quarkus-keycloak-admin-client` or the `quarkus-keycloak-admin-client-reactive` (if the application uses `quarkus-rest-client-reactive`) extension.
-For more information, see the xref:security-keycloak-admin-client.adoc[Quarkus Keycloak Admin Client] guide.
+For more information, see the link:{quarkusio-guides}/security-keycloak-admin-client[Quarkus Keycloak Admin Client] guide.
+
 ====
 endif::no-quarkus-keycloak-admin-client[]
 
 
-
-[[keycloak-dev-mode]]
+[id="keycloak-dev-mode_{context}"]
 == Run the application in dev mode
 
 . To run the application in dev mode, run the following commands:
@@ -246,8 +252,8 @@ endif::no-quarkus-keycloak-admin-client[]
 ====
 include::{includes}/devtools/dev.adoc[]
 ====
-* xref:security-openid-connect-dev-services.adoc[Dev Services for Keycloak] will start a Keycloak container and import a `quarkus-realm.json`.
-. Open a xref:dev-ui.adoc[Dev UI], which you can find at http://localhost:8080/q/dev-ui[/q/dev-ui].
+* link:{quarkusio-guides}/security-openid-connect-dev-services[Dev Services for Keycloak] will start a Keycloak container and import a `quarkus-realm.json`.
+. Open a link:{quarkusio-guides}/dev-ui[Dev UI], which you can find at http://localhost:8080/q/dev-ui[/q/dev-ui].
 Then, in an `OpenID Connect` card, click the `Keycloak provider` link .
 . When prompted to log in to a `Single Page Application` provided by `OpenID Connect Dev UI`, do the following steps:
 
@@ -301,7 +307,7 @@ include::{includes}/devtools/build-native.adoc[]
 
 == Test the application
 
-For information about testing your application in dev mode, see the preceding <<keycloak-dev-mode>> section.
+For information about testing your application in dev mode, see the preceding xref:keycloak-dev-mode_{context}[Run the application in dev mode] section.
 
 You can test the application launched in JVM or native modes with `curl`.
 
@@ -352,22 +358,22 @@ export access_token=$(\
  )
 ----
 
-For information about writing integration tests that depend on `Dev Services for Keycloak`, see the xref:security-oidc-bearer-token-authentication.adoc#integration-testing-keycloak-devservices[Dev Services for Keycloak] section of the "OpenID Connect (OIDC) Bearer token authentication" guide.
+For information about writing integration tests that depend on `Dev Services for Keycloak`, see the link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication#integration-testing-keycloak-devservices[Dev Services for Keycloak] section of the "OpenID Connect (OIDC) Bearer token authentication" guide.
 
 //:sectnums!:
 
 == References
 
-* xref:security-oidc-configuration-properties-reference.adoc[OIDC configuration properties]
-* xref:security-oidc-bearer-token-authentication.adoc[OpenID Connect (OIDC) Bearer token authentication]
+* link:{default-url}/openid-connect-authentication/security-oidc-configuration-properties-reference[OIDC configuration properties]
+* link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OpenID Connect (OIDC) Bearer token authentication]
 * link:https://www.keycloak.org/documentation.html[Keycloak Documentation]
 * link:https://openid.net/connect/[OpenID Connect]
 * link:https://tools.ietf.org/html/rfc7519[JSON Web Token]
-* xref:security-openid-connect-client-reference.adoc[OpenID Connect and OAuth2 Client and Filters Reference Guide]
-* xref:security-openid-connect-dev-services.adoc[Dev Services for Keycloak]
-* xref:security-jwt-build.adoc[Sign and encrypt JWT tokens with SmallRye JWT Build]
-* xref:security-authentication-mechanisms.adoc#combining-authentication-mechanisms[Combining authentication mechanisms]
-* xref:security-overview.adoc[Quarkus Security overview]
+* link:{default-url}/openid-connect-authentication/security-openid-connect-client-reference[OpenID Connect and OAuth2 Client and Filters Reference Guide]
+* link:{quarkusio-guides}/security-openid-connect-dev-services[Dev Services for Keycloak]
+* link:{quarkusio-guides}/security-jwt-build[Sign and encrypt JWT tokens with SmallRye JWT Build]
+* link:{default-url}/security-architecture/security-authentication-mechanisms#combining-authentication-mechanisms[Combining authentication mechanisms]
+* link:{default-url}/security-overview/security-overview[Quarkus Security overview]
 ifndef::no-quarkus-keycloak-admin-client[]
-* xref:security-keycloak-admin-client.adoc[Quarkus Keycloak Admin Client]
+* link:{quarkusio-guides}/security-keycloak-admin-client[Quarkus Keycloak Admin Client]
 endif::no-quarkus-keycloak-admin-client[]

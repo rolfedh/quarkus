@@ -25,16 +25,16 @@ Quarkus provides a unified configuration model to define datasources for Java Da
 Quarkus uses link:https://agroal.github.io/[Agroal] and link:https://vertx.io/[Vert.x] to provide high-performance, scalable data source connection pooling for JDBC and reactive drivers.
 The `quarkus-jdbc-\*` and `quarkus-reactive-*-client` extensions provide build time optimizations and integrate configured data sources with Quarkus features like security, health checks, and metrics.
 
-For more information about consuming and using a reactive datasource, see the Quarkus xref:reactive-sql-clients.adoc[Reactive SQL clients] guide.
+For more information about consuming and using a reactive datasource, see the Quarkus link:{quarkusio-guides}/reactive-sql-clients[Reactive SQL clients] guide.
 
-Additionally, refer to the Quarkus xref:hibernate-orm.adoc[Hibernate ORM] guide for information on consuming and using a JDBC datasource.
+Additionally, refer to the Quarkus link:{quarkusio-guides}/hibernate-orm[Hibernate ORM] guide for information on consuming and using a JDBC datasource.
 
 
 == Get started with configuring `datasources` in Quarkus
 
 For users familiar with the fundamentals, this section provides an overview and code samples to set up data sources quickly.
 
-For more advanced configuration with examples, see <<datasource-reference>>.
+For more advanced configuration with examples, see xref:datasource-reference[References].
 
 [[dev-services]]
 === Zero-config setup in development mode
@@ -51,11 +51,11 @@ This is useful if you want to connect to the database with an external tool.
 To use this feature, ensure a Docker or Podman container runtime is installed, depending on the database type. Certain databases, such as H2, operate in in-memory mode and do not require a container runtime.
 
 TIP: Prefix the actual connection details for prod mode with `%prod.` to ensure they are not applied in dev mode.
-For more information, see the xref:config-reference.adoc#profiles[Profiles] section of the "Configuration reference" guide.
+For more information, see the link:{quarkusio-guides}/config-reference#profiles[Profiles] section of the "Configuration reference" guide.
 
-For more information about Dev Services, see xref:dev-services.adoc[Dev Services overview].
+For more information about Dev Services, see link:{quarkusio-guides}/dev-services[Dev Services overview].
 
-For more details and optional configurations, see xref:databases-dev-services.adoc[Dev Services for databases].
+For more details and optional configurations, see link:{quarkusio-guides}/databases-dev-services[Dev Services for databases].
 
 
 === Configure a JDBC datasource
@@ -94,7 +94,7 @@ The optimal pool size depends on many factors, such as the number of parallel ap
 
 Be aware that setting the pool size too low might cause some requests to time out while waiting for a connection.
 
-For more information about pool size adjustment properties, see the <<jdbc-configuration>> section.
+For more information about pool size adjustment properties, see the xref:jdbc-configuration[JDBC configuration reference] section.
 
 
 === Configure a reactive datasource
@@ -159,7 +159,7 @@ Quarkus currently includes the following built-in database kinds:
 +
 [NOTE]
 ====
-You can use any JDBC driver in a Quarkus app in JVM mode as described in <<other-databases,Using other databases>>.
+You can use any JDBC driver in a Quarkus app in JVM mode as described in xref:other-databases[Using other databases].
 However, using a non-built-in database kind is unlikely to work when compiling your application to a native executable.
 
 For native executable builds, it is recommended to either use the available JDBC Quarkus extensions or contribute a custom extension for your specific driver.
@@ -194,7 +194,7 @@ JDBC is the most common database connection pattern, typically needed when used 
 ====
 H2 and Derby databases can be configured to run in "embedded mode"; however, the Derby extension does not support compiling the embedded database engine into native executables.
 
-Read <<in-memory-databases,Testing with in-memory databases>> for suggestions regarding integration testing.
+Read xref:in-memory-databases[Testing with in-memory databases] for suggestions regarding integration testing.
 ====
 * DB2 - `quarkus-jdbc-db2`
 * MariaDB - `quarkus-jdbc-mariadb`
@@ -225,7 +225,7 @@ However, for custom drivers, Agroal needs to be added explicitly.
 ./mvnw quarkus:add-extension -Dextensions="agroal"
 ----
 +
-To use a JDBC driver for another database, <<other-databases,use a database with no built-in extension or with a different driver>>.
+To use a JDBC driver for another database, xref:other-databases[use a database with no built-in extension or with a different driver].
 
 
 . Configure the JDBC connection by defining the JDBC URL property:
@@ -242,7 +242,7 @@ All the configuration properties specific to JDBC have the `jdbc` prefix.
 For reactive datasources, the prefix is `reactive`.
 ====
 
-For more information about configuring JDBC, see <<jdbc-url,JDBC URL format reference>> and <<extensions-and-database-drivers-reference,Quarkus extensions and database drivers reference>>.
+For more information about configuring JDBC, see xref:jdbc-url[JDBC URL format reference] and xref:extensions-and-database-drivers-reference[Quarkus extensions and database drivers reference].
 
 
 [[other-databases]]
@@ -257,7 +257,7 @@ If you plan to make a native executable, use the existing JDBC Quarkus extension
 
 [WARNING]
 ====
-OpenTracing has been deprecated in favor of OpenTelemetry. For tracing information, please check the related section about <<datasource-tracing>>, bellow.
+OpenTracing has been deprecated in favor of OpenTelemetry. For tracing information, please check the related section about xref:datasource-tracing[Datasource tracing], bellow.
 ====
 
 .A custom driver definition example with the legacy OpenTracing driver:
@@ -279,7 +279,7 @@ quarkus.datasource.password=tiger
 ----
 
 For all the details about the JDBC configuration options and configuring other aspects,
-such as the connection pool size, refer to the <<jdbc-configuration,JDBC configuration reference>> section.
+such as the connection pool size, refer to the xref:jdbc-configuration[JDBC configuration reference] section.
 
 ===== Consuming the datasource
 
@@ -327,7 +327,7 @@ The proper size always depends on many factors, such as the number of parallel a
 
 Be aware that setting the pool size too low might cause some requests to time out while waiting for a connection.
 
-For more information about pool size adjustment properties, see the <<reactive-configuration>> section.
+For more information about pool size adjustment properties, see the xref:reactive-configuration[Reactive datasource configuration reference] section.
 
 ==== JDBC and reactive datasources simultaneously
 
@@ -356,7 +356,7 @@ In most cases, the configuration above will be optional as either a JDBC driver 
 
 [NOTE]
 ====
-The Hibernate ORM extension supports defining xref:hibernate-orm.adoc#multiple-persistence-units[persistence units] by using configuration properties.
+The Hibernate ORM extension supports defining link:{quarkusio-guides}/hibernate-orm#multiple-persistence-units[persistence units] by using configuration properties.
 For each persistence unit, point to the datasource of your choice.
 ====
 
@@ -392,7 +392,7 @@ Notice there is an extra section in the configuration property.
 The syntax is as follows: `quarkus.datasource.[optional name.][datasource property]`.
 
 NOTE: Even when only one database extension is installed, named databases need to specify at least one build-time property so that Quarkus can detect them.
-Generally, this is the `db-kind` property, but you can also specify Dev Services properties to create named datasources according to the xref:databases-dev-services.adoc[Dev Services for Databases] guide.
+Generally, this is the `db-kind` property, but you can also specify Dev Services properties to create named datasources according to the link:{quarkusio-guides}/databases-dev-services[Dev Services for Databases] guide.
 
 ==== Named datasource injection
 
@@ -434,7 +434,7 @@ If another Quarkus extension relies on an inactive datasource,
 that extension might fail to start.
 
 In such case, you will need to deactivate that other extension too.
-For example see xref:hibernate-orm.adoc#persistence-unit-active[here for Hibernate ORM].
+For example see link:{quarkusio-guides}/hibernate-orm#persistence-unit-active[here for Hibernate ORM].
 ====
 
 For example, with the following configuration:
@@ -450,17 +450,17 @@ quarkus.datasource."oracle".active=false
 quarkus.datasource."oracle".jdbc.url=jdbc:oracle:///your_database
 ----
 
-Setting `quarkus.datasource."pg".active=true` xref:config-reference.adoc#configuration-sources[at runtime]
+Setting `quarkus.datasource."pg".active=true` link:{quarkusio-guides}/config-reference#configuration-sources[at runtime]
 will make only the PostgreSQL datasource available,
 and setting `quarkus.datasource."oracle".active=true` at runtime
 will make only the Oracle datasource available.
 
 [TIP]
 ====
-xref:config-reference.adoc#custom-profiles[Custom configuration profiles] can help simplify such a setup.
+link:{quarkusio-guides}/config-reference#custom-profiles[Custom configuration profiles] can help simplify such a setup.
 By appending the following profile-specific configuration to the one above,
 you can select a persistence unit/datasource at runtime simply by
-xref:config-reference.adoc#multiple-profiles[setting `quarkus.profile`]:
+link:{quarkusio-guides}/config-reference#multiple-profiles[setting `quarkus.profile`]:
 `quarkus.profile=prod,pg` or `quarkus.profile=prod,oracle`.
 
 [source,properties]
@@ -477,7 +477,7 @@ xref:config-reference.adoc#multiple-profiles[setting `quarkus.profile`]:
 
 [TIP]
 ====
-It can also be useful to define a xref:cdi.adoc#ok-you-said-that-there-are-several-kinds-of-beans[CDI bean producer] redirecting to the currently active datasource,
+It can also be useful to define a link:{quarkusio-guides}/cdi#ok-you-said-that-there-are-several-kinds-of-beans[CDI bean producer] redirecting to the currently active datasource,
 like this:
 
 [source,java,indent=0]
@@ -596,7 +596,7 @@ quarkus.datasource."datasource-name".health-exclude=true
 
 === Datasource metrics
 
-If you are using the xref:telemetry-micrometer.adoc[`quarkus-micrometer`] or xref:smallrye-metrics.adoc[`quarkus-smallrye-metrics`] extension, `quarkus-agroal` can contribute some datasource-related metrics to the metric registry.
+If you are using the link:{quarkusio-guides}/telemetry-micrometer[`quarkus-micrometer`] or link:{quarkusio-guides}/smallrye-metrics[`quarkus-smallrye-metrics`] extension, `quarkus-agroal` can contribute some datasource-related metrics to the metric registry.
 This can be activated by setting the `quarkus.datasource.metrics.enabled` property to `true`.
 
 For the exposed metrics to contain any actual values, a metric collection must be enabled internally by the Agroal mechanisms.
@@ -615,9 +615,9 @@ If the metrics collection for this datasource is disabled, all values result in 
 [[datasource-tracing]]
 === Datasource tracing
 
-To use tracing with a datasource, you need to add the xref:opentelemetry.adoc[`quarkus-opentelemetry`] extension to your project.
+To use tracing with a datasource, you need to add the link:{quarkusio-guides}/opentelemetry[`quarkus-opentelemetry`] extension to your project.
 
-You don't need to declare a different driver because you need tracing. If you use a JDBC driver, you need to follow the instructions in the OpenTelemetry extension xref:opentelemetry.adoc#jdbc[here].
+You don't need to declare a different driver because you need tracing. If you use a JDBC driver, you need to follow the instructions in the OpenTelemetry extension link:{quarkusio-guides}/opentelemetry#jdbc[here].
 
 Even with all the tracing infrastructure in place the datasource tracing is not enabled by default, and you need to enable it by setting this property:
 [source, properties]
@@ -635,9 +635,9 @@ You can override this by setting the `transactions` configuration property:
 * `quarkus.datasource.jdbc.transactions` for default unnamed datasource
 * `quarkus.datasource._<datasource-name>_.jdbc.transactions` for named datasource
 
-For more information, see the <<configuration-reference,Configuration reference>> section below.
+For more information, see the xref:configuration-reference[Configuration reference] section below.
 
-To facilitate the storage of transaction logs in a database by using JDBC, see xref:transaction.adoc#jdbcstore[Configuring transaction logs to be stored in a datasource] section of the xref:transaction.adoc[Using transactions in Quarkus] guide.
+To facilitate the storage of transaction logs in a database by using JDBC, see link:{quarkusio-guides}/transaction#jdbcstore[Configuring transaction logs to be stored in a datasource] section of the link:{quarkusio-guides}/transaction[Using transactions in Quarkus] guide.
 
 ==== Named datasources
 
@@ -650,7 +650,7 @@ You will usually specify the `db-kind` property or explicitly enable Dev Service
 
 Some databases like H2 and Derby are commonly used in the _embedded mode_ as a facility to run integration tests quickly.
 
-The recommended approach is to use the real database you intend to use in production, especially when xref:databases-dev-services.adoc[Dev Services provide a zero-config database for testing], and running tests against a container is relatively quick and produces expected results on an actual environment.
+The recommended approach is to use the real database you intend to use in production, especially when link:{quarkusio-guides}/databases-dev-services[Dev Services provide a zero-config database for testing], and running tests against a container is relatively quick and produces expected results on an actual environment.
 However, it is also possible to use JVM-powered databases for scenarios when the ability to run simple integration tests is required.
 
 

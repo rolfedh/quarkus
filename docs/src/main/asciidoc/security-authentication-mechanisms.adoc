@@ -1,10 +1,10 @@
+= Authentication mechanisms in Quarkus
 ////
 This document is maintained in the main Quarkus repository
 and pull requests should be submitted there:
 https://github.com/quarkusio/quarkus/tree/main/docs/src/main/asciidoc
 ////
 [id="security-authentication-mechanisms"]
-= Authentication mechanisms in Quarkus
 include::_attributes.adoc[]
 :diataxis-type: concept
 :categories: security,web
@@ -23,8 +23,8 @@ Before you choose an authentication mechanism for securing your Quarkus applicat
 Some supported authentication mechanisms are built into Quarkus, while others require you to add an extension.
 All of these mechanisms are detailed in the following sections:
 
-* <<built-in-authentication-mechanisms>>
-* <<other-supported-authentication-mechanisms>>
+* xref:built-in-authentication-mechanisms[Built-in authentication mechanisms]
+* xref:other-supported-authentication-mechanisms[Other supported authentication mechanisms]
 
 The following table maps specific authentication requirements to a supported mechanism that you can use in Quarkus:
 
@@ -33,45 +33,46 @@ The following table maps specific authentication requirements to a supported mec
 |====
 |Authentication requirement |Authentication mechanism
 
-|Username and password |xref:security-basic-authentication.adoc[Basic], <<form-auth>>
+|Username and password |link:{default-url}/basic-authentication/security-basic-authentication[Basic], xref:form-auth[Form-based authentication]
 
-|Bearer access token |xref:security-oidc-bearer-token-authentication.adoc[OIDC Bearer token authentication], xref:security-jwt.adoc[JWT]
+|Bearer access token |link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OIDC Bearer token authentication], link:{quarkusio-guides}/security-jwt[JWT]
 ifndef::no-quarkus-elytron-security-oauth2[]
-, xref:security-oauth2.adoc[OAuth2]
+, link:{quarkusio-guides}/security-oauth2[OAuth2]
 endif::no-quarkus-elytron-security-oauth2[]
 
-|Single sign-on (SSO) |xref:security-oidc-code-flow-authentication.adoc[OIDC Code Flow], <<form-auth>>
+|Single sign-on (SSO) |link:{default-url}/openid-connect-authentication/security-oidc-code-flow-authentication[OIDC Code Flow], xref:form-auth[Form-based authentication]
 
-|Client certificate |<<mutual-tls>>
+|Client certificate |xref:mutual-tls[Mutual TLS authentication]
 
 ifndef::no-webauthn-authentication[]
-|WebAuthn |xref:security-webauthn.adoc[WebAuthn]
+|WebAuthn |link:{quarkusio-guides}/security-webauthn[WebAuthn]
 endif::no-webauthn-authentication[]
 
 |Kerberos ticket |link:https://quarkiverse.github.io/quarkiverse-docs/quarkus-kerberos/dev/index.html[Kerberos]
 |====
 
-For more information, see the following <<table>> table.
+For more information, see the following xref:table[Token authentication mechanism comparison] table.
 
 [[built-in-authentication-mechanisms]]
 == Built-in authentication mechanisms
 
 Quarkus Security provides the following built-in authentication support:
 
-* xref:security-basic-authentication.adoc[Basic authentication]
-* <<form-auth>>
-* <<mutual-tls>>
+* link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication]
+* xref:form-auth[Form-based authentication]
+* xref:mutual-tls[Mutual TLS authentication]
 
+[[basic-auth]]
 === Basic authentication
 
 You can secure your Quarkus application endpoints with the built-in HTTP Basic authentication mechanism.
 For more information, see the following documentation:
 
-* xref:security-basic-authentication.adoc[Basic authentication]
-** xref:security-basic-authentication-howto.adoc[Enable Basic authentication]
-* xref:security-jpa.adoc[Quarkus Security with Jakarta Persistence]
-** xref:security-getting-started-tutorial.adoc[Getting started with Security by using Basic authentication and Jakarta Persistence]
-* xref:security-identity-providers.adoc[Identity providers]
+* link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication]
+** link:{default-url}/basic-authentication/security-basic-authentication-howto[Enable Basic authentication]
+* link:{default-url}/getting-started-with-security/security-jpa[Quarkus Security with Jakarta Persistence]
+** link:{default-url}/getting-started-with-security/security-getting-started-tutorial[Getting started with Security by using Basic authentication and Jakarta Persistence]
+* link:{default-url}/security-architecture/security-identity-providers[Identity providers]
 
 [[form-auth]]
 === Form-based authentication
@@ -186,7 +187,7 @@ include::{generated-dir}/config/quarkus-vertx-http-config-group-auth-runtime-con
 Quarkus provides mutual TLS (mTLS) authentication so that you can authenticate users based on their X.509 certificates.
 
 To use this authentication method, you must first enable SSL/TLS for your application.
-For more information, see the xref:http-reference.adoc#ssl[Supporting secure connections with SSL/TLS] section of the Quarkus "HTTP reference" guide.
+For more information, see the link:{quarkusio-guides}/http-reference#ssl[Supporting secure connections with SSL/TLS] section of the Quarkus "HTTP reference" guide.
 
 After your application accepts secure connections, the next step is to configure the `quarkus.http.ssl.certificate.trust-store-file` property with the name of that file that holds all the certificates your application trusts. The specified file also includes information about how your application asks for certificates when a client, such as a browser or other service, tries to access one of its protected resources.
 
@@ -246,7 +247,7 @@ The information from the client certificate can be used to add roles to Quarkus 
 You can add new roles to `SecurityIdentity` after checking a client certificate's common name (CN) attribute.
 The easiest way to add new roles is to use a certificate attribute to role mapping feature.
 
-For example, you can update the properties shown in the section which introduces <<mutual-tls>> as follows:
+For example, you can update the properties shown in the section which introduces xref:mutual-tls[Mutual TLS authentication] as follows:
 
 [source,properties]
 ----
@@ -270,10 +271,10 @@ Given the preceeding configuration, the request is authorized if the client cert
 
 ==== Using certificate attributes to augment SecurityIdentity
 
-You can always register `SecurityIdentityAugmentor` if the automatic <<map-certificate-attributes-to-roles>> option does not suit.
+You can always register `SecurityIdentityAugmentor` if the automatic xref:map-certificate-attributes-to-roles[Mapping certificate attributes to roles] option does not suit.
 Custom `SecurityIdentityAugmentor` can check the values of different client certificate attributes and augment the `SecurityIdentity` accordingly.
 
-For more information about customizing `SecurityIdentity`, see the xref:security-customization.adoc#security-identity-customization[Security identity customization] section in the Quarkus "Security tips and tricks" guide.
+For more information about customizing `SecurityIdentity`, see the link:{quarkusio-guides}/security-customization#security-identity-customization[Security identity customization] section in the Quarkus "Security tips and tricks" guide.
 
 [[other-supported-authentication-mechanisms]]
 == Other supported authentication mechanisms
@@ -281,12 +282,12 @@ For more information about customizing `SecurityIdentity`, see the xref:security
 Quarkus Security also supports the following authentication mechanisms through extensions:
 
 ifndef::no-webauthn-authentication[]
-* <<webauthn-authentication>>
+* xref:webauthn-authentication[WebAuthn authentication]
 endif::no-webauthn-authentication[]
-* <<openid-connect-authentication>>
-* <<smallrye-jwt-authentication>>
+* xref:openid-connect-authentication[OpenID Connect authentication]
+* xref:smallrye-jwt-authentication[SmallRye JWT authentication]
 ifndef::no-quarkus-elytron-security-oauth2[]
-* <<oauth2-authentication>>
+* xref:oauth2-authentication[OAuth2 authentication]
 endif::no-quarkus-elytron-security-oauth2[]
 
 ifndef::no-webauthn-authentication[]
@@ -295,7 +296,7 @@ ifndef::no-webauthn-authentication[]
 
 https://webauthn.guide/[WebAuthn] is an authentication mechanism that replaces passwords.
 When you write a service for registering new users, or logging them in, instead of asking for a password, you can use WebAuthn, which replaces the password.
-For more information, see the xref:security-webauthn.adoc[Secure a Quarkus application by using the WebAuthn authentication mechanism] guide.
+For more information, see the link:{quarkusio-guides}/security-webauthn[Secure a Quarkus application by using the WebAuthn authentication mechanism]
 endif::no-webauthn-authentication[]
 
 [[openid-connect-authentication]]
@@ -315,7 +316,7 @@ However, opaque, also known as binary tokens, can only be introspected remotely.
 
 [NOTE]
 ====
-Using the Quarkus OIDC extension, both the Bearer token and Authorization Code Flow authentication mechanisms use <<smallrye-jwt-authentication>> to represent JWT tokens as MicroProfile JWT `org.eclipse.microprofile.jwt.JsonWebToken`.
+Using the Quarkus OIDC extension, both the Bearer token and Authorization Code Flow authentication mechanisms use xref:smallrye-jwt-authentication[SmallRye JWT authentication] to represent JWT tokens as MicroProfile JWT `org.eclipse.microprofile.jwt.JsonWebToken`.
 ====
 
 ==== Additional Quarkus resources for OIDC authentication
@@ -325,14 +326,14 @@ For more information about OIDC authentication and authorization methods that yo
 [options="header"]
 |====
 |OIDC topic |Quarkus information resource
-|Bearer token authentication mechanism|xref:security-oidc-bearer-token-authentication.adoc[OIDC Bearer token authentication]
-|Authorization Code Flow authentication mechanism|xref:security-oidc-code-flow-authentication.adoc[OpenID Connect (OIDC) Authorization Code Flow mechanism]
-|OIDC and SAML Identity broker|xref:security-oidc-code-flow-authentication.adoc#oidc-saml-broker[OpenID Connect (OIDC) Authorization Code Flow and SAML Identity broker]
-|Multiple tenants that can support the Bearer token authentication or Authorization Code Flow mechanisms|xref:security-openid-connect-multitenancy.adoc[Using OpenID Connect (OIDC) multi-tenancy]
-|Securing Quarkus with commonly used OpenID Connect providers|xref:security-openid-connect-providers.adoc[Configuring well-known OpenID Connect providers]
-|Using Keycloak to centralize authorization |xref:security-keycloak-authorization.adoc[Using OpenID Connect (OIDC) and Keycloak to centralize authorization]
+|Bearer token authentication mechanism|link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OIDC Bearer token authentication]
+|Authorization Code Flow authentication mechanism|link:{default-url}/openid-connect-authentication/security-oidc-code-flow-authentication[OpenID Connect (OIDC) Authorization Code Flow mechanism]
+|OIDC and SAML Identity broker|link:{default-url}/openid-connect-authentication/security-oidc-code-flow-authentication#oidc-saml-broker[OpenID Connect (OIDC) Authorization Code Flow and SAML Identity broker]
+|Multiple tenants that can support the Bearer token authentication or Authorization Code Flow mechanisms|link:{default-url}/openid-connect-authentication/security-openid-connect-multitenancy[Using OpenID Connect (OIDC) multi-tenancy]
+|Securing Quarkus with commonly used OpenID Connect providers|link:{quarkusio-guides}/security-openid-connect-providers[Configuring well-known OpenID Connect providers]
+|Using Keycloak to centralize authorization |link:{quarkusio-guides}/security-keycloak-authorization[Using OpenID Connect (OIDC) and Keycloak to centralize authorization]
 ifndef::no-quarkus-keycloak-admin-client[]
-|Configuring Keycloak programmatically |xref:security-keycloak-admin-client.adoc[Using the Keycloak admin client]
+|Configuring Keycloak programmatically |link:{quarkusio-guides}/security-keycloak-admin-client[Using the Keycloak admin client]
 endif::no-quarkus-keycloak-admin-client[]
 |====
 
@@ -341,7 +342,7 @@ endif::no-quarkus-keycloak-admin-client[]
 To enable the Quarkus OIDC extension at runtime, set `quarkus.oidc.tenant-enabled=false` at build time.
 Then, re-enable it at runtime by using a system property.
 
-For more information about managing the individual tenant configurations in multitenant OIDC deployments, see the xref:security-openid-connect-multitenancy.adoc#disable-tenant[Disabling tenant configurations] section in the "Using OpenID Connect (OIDC) multi-tenancy" guide.
+For more information about managing the individual tenant configurations in multitenant OIDC deployments, see the link:{default-url}/openid-connect-authentication/security-openid-connect-multitenancy#disable-tenant[Disabling tenant configurations] section in the "Using OpenID Connect (OIDC) multi-tenancy" guide.
 ====
 
 ==== OpenID Connect client and filters
@@ -368,9 +369,8 @@ It provides Jakarta REST `TokenCredentialRequestFilter`, which sets the OpenID C
 This filter can be registered with MicroProfile REST client implementations injected into the current Quarkus endpoint, which must be protected by using the Quarkus OIDC adapter.
 This filter can propagate the access token to the downstream services.
 
-For more information, see the xref:security-openid-connect-client.adoc[OpenID Connect client and token propagation quickstart] and xref:security-openid-connect-client-reference.adoc[OpenID Connect (OIDC) and OAuth2 client and filters reference] guides.
+For more information, see the link:{default-url}/openid-connect-authentication/security-openid-connect-client[OpenID Connect client and token propagation quickstart] and link:{default-url}/openid-connect-authentication/security-openid-connect-client-reference[OpenID Connect (OIDC) and OAuth2 client and filters reference] guides.
 endif::no-quarkus-oidc-token-propagation[]
-
 
 [[smallrye-jwt-authentication]]
 === SmallRye JWT authentication
@@ -381,7 +381,7 @@ It represents them as `org.eclipse.microprofile.jwt.JsonWebToken`.
 `quarkus-smallrye-jwt` is an alternative to the `quarkus-oidc` Bearer token authentication mechanism and verifies only `JWT` tokens by using either Privacy Enhanced Mail (PEM) keys or the refreshable `JWK` key set.
 `quarkus-smallrye-jwt` also provides the JWT generation API, which you can use to easily create `signed`, `inner-signed`, and `encrypted` `JWT` tokens.
 
-For more information, see the xref:security-jwt.adoc[Using JWT RBAC] guide.
+For more information, see the link:{quarkusio-guides}/security-jwt[Using JWT RBAC] guide.
 
 ifndef::no-quarkus-elytron-security-oauth2[]
 [[oauth2-authentication]]
@@ -390,7 +390,7 @@ ifndef::no-quarkus-elytron-security-oauth2[]
 `quarkus-elytron-security-oauth2` provides an alternative to the Quarkus `quarkus-oidc` Bearer token authentication mechanism extension.
 `quarkus-elytron-security-oauth2` is based on `Elytron` and is primarily intended for introspecting opaque tokens remotely.
 
-For more information, see the Quarkus xref:security-oauth2.adoc[Using OAuth2] guide.
+For more information, see the Quarkus link:{quarkusio-guides}/security-oauth2[Using OAuth2] guide.
 endif::no-quarkus-elytron-security-oauth2[]
 
 [[oidc-jwt-oauth2-comparison]]
@@ -535,7 +535,7 @@ For example, you can combine the built-in Basic and the Quarkus `quarkus-oidc` B
 You cannot combine the Quarkus `quarkus-oidc` Bearer token and `smallrye-jwt` authentication mechanisms because both mechanisms attempt to verify the token extracted from the HTTP Bearer token authentication scheme.
 ====
 
-=== Path-specific authentication mechanisms
+=== Use HTTP Security Policy to enable path-based authentication
 
 The following configuration example demonstrates how you can enforce a single selectable authentication mechanism for a given request path:
 
@@ -559,11 +559,11 @@ Ensure that the value of the `auth-mechanism` property matches the authenticatio
 
 Proactive authentication is enabled in Quarkus by default.
 This means that if an incoming request has a credential, the request will always be authenticated, even if the target page does not require authentication.
-For more information, see the Quarkus xref:security-proactive-authentication.adoc[Proactive authentication] guide.
+For more information, see the Quarkus link:{default-url}/security-architecture/security-proactive-authentication[Proactive authentication] guide.
 
 == References
 
-* xref:security-overview.adoc[Quarkus Security overview]
-* xref:security-architecture.adoc[Quarkus Security architecture]
-* xref:security-identity-providers.adoc[Identity providers]
-* xref:security-authorize-web-endpoints-reference.adoc[Authorization of web endpoints]
+* link:{default-url}/security-overview/security-overview[Quarkus Security overview]
+* link:{default-url}/security-architecture/security-architecture[Quarkus Security architecture]
+* link:{default-url}/security-architecture/security-identity-providers[Identity providers]
+* link:{default-url}/authorization/security-authorize-web-endpoints-reference[Authorization of web endpoints]

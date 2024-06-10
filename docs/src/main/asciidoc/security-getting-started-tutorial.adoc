@@ -11,11 +11,11 @@ include::_attributes.adoc[]
 :topics: security,authentication,basic-authentication,http
 :extensions: io.quarkus:quarkus-vertx-http,io.quarkus:quarkus-elytron-security-jdbc,io.quarkus:quarkus-elytron-security-ldap,io.quarkus:quarkus-security-jpa-reactive
 
-Get started with Quarkus Security by securing your Quarkus application endpoints with the built-in Quarkus xref:security-basic-authentication.adoc[Basic authentication] and the Jakarta Persistence identity provider, enabling role-based access control.
+Get started with Quarkus Security by securing your Quarkus application endpoints with the built-in Quarkus link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication] and the Jakarta Persistence identity provider, enabling role-based access control.
 
-The Jakarta Persistence `IdentityProvider` verifies and converts a xref:security-basic-authentication.adoc[Basic authentication] user name and password pair to a `SecurityIdentity` instance, which is used to authorize access requests, making your Quarkus application secure.
+The Jakarta Persistence `IdentityProvider` verifies and converts a link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication] user name and password pair to a `SecurityIdentity` instance, which is used to authorize access requests, making your Quarkus application secure.
 
-For more information about Jakarta Persistence, see the xref:security-jpa.adoc[Quarkus Security with Jakarta Persistence] guide.
+For more information about Jakarta Persistence, see the link:{default-url}/getting-started-with-security/security-jpa[Quarkus Security with Jakarta Persistence] guide.
 
 This tutorial prepares you to implement more advanced security mechanisms in Quarkus, for example, how to use the OpenID Connect (OIDC) authentication mechanism.
 
@@ -63,10 +63,10 @@ endif::no-quarkus-security-jpa-reactive[]
 
 [NOTE]
 ====
-xref:hibernate-orm-panache.adoc[Hibernate ORM with Panache] is used to store your user identities, but you can also use xref:hibernate-orm.adoc[Hibernate ORM] with the `quarkus-security-jpa` extension.
+link:{quarkusio-guides}/hibernate-orm-panache[Hibernate ORM with Panache] is used to store your user identities, but you can also use link:{quarkusio-guides}/hibernate-orm[Hibernate ORM] with the `security-jpa` extension.
 
 ifndef::no-quarkus-security-jpa-reactive[]
-Both xref:hibernate-reactive.adoc[Hibernate Reactive] and xref:hibernate-reactive-panache.adoc[Hibernate Reactive with Panache] can be used with the `quarkus-security-jpa-reactive` extension.
+Both link:{quarkusio-guides}/hibernate-reactive[Hibernate Reactive] and link:{quarkusio-guides}/hibernate-reactive-panache[Hibernate Reactive with Panache] can be used with the `security-jpa-reactive` extension.
 endif::no-quarkus-security-jpa-reactive[]
 
 You must also add your preferred database connector library.
@@ -110,39 +110,51 @@ After you have run either of the preceding commands to create the Maven project,
 * To verify the `quarkus-security-jpa` extension, check for the following configuration:
 +
 ====
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
     <groupId>io.quarkus</groupId>
     <artifactId>quarkus-security-jpa</artifactId>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 implementation("io.quarkus:quarkus-security-jpa")
 ----
+--
 ====
 ifndef::no-quarkus-security-jpa-reactive[]
 * To verify the `quarkus-security-jpa-reactive` extension, check for the following configuration:
 +
 ====
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
     <groupId>io.quarkus</groupId>
     <artifactId>quarkus-security-jpa-reactive</artifactId>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 implementation("io.quarkus:quarkus-security-jpa-reactive")
 ----
+--
 ====
 endif::no-quarkus-security-jpa-reactive[]
 
@@ -231,7 +243,7 @@ public class UserResource {
 ----
 ====
 
-[[define-the-user-entity]]
+[id="define-the-user-entity"]
 == Define the user entity
 
 * You can now describe how you want security information to be stored in the model by adding annotations to the `user` entity, as outlined in the following code snippet:
@@ -290,7 +302,7 @@ You can configure it to use plain text or custom passwords.
 
 [NOTE]
 ====
-Don’t forget to set up the Panache and PostgreSQL JDBC driver, please see xref:hibernate-orm-panache.adoc#setting-up-and-configuring-hibernate-orm-with-panache[Setting up and configuring Hibernate ORM with Panache] for more information.
+Don’t forget to set up the Panache and PostgreSQL JDBC driver, please see link:{quarkusio-guides}/hibernate-orm-panache#setting-up-and-configuring-hibernate-orm-with-panache[Setting up and configuring Hibernate ORM with Panache] for more information.
 ====
 ifndef::no-quarkus-security-jpa-reactive[]
 [NOTE]
@@ -302,13 +314,13 @@ endif::no-quarkus-security-jpa-reactive[]
 
 == Configure the application
 
-. Enable the built-in Quarkus xref:security-basic-authentication.adoc[Basic authentication] mechanism by setting the `quarkus.http.auth.basic` property to `true`:
+. Enable the built-in Quarkus link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication] mechanism by setting the `quarkus.http.auth.basic` property to `true`:
 +
 `quarkus.http.auth.basic=true`
 +
 [NOTE]
 ====
-When secure access is required, and no other authentication mechanisms are enabled, the built-in xref:security-basic-authentication.adoc[Basic authentication] of Quarkus is the fallback authentication mechanism.
+When secure access is required, and no other authentication mechanisms are enabled, the built-in link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication] of Quarkus is the fallback authentication mechanism.
 Therefore, in this tutorial, you do not need to set the property `quarkus.http.auth.basic` to `true`.
 ====
 +
@@ -382,12 +394,14 @@ As a result, the `quarkus-security-jpa` defaults to using bcrypt-hashed password
 
 == Test your application by using Dev Services for PostgreSQL
 
-Complete the integration testing of your application in JVM and native modes by using xref:dev-services.adoc#databases[Dev Services for PostgreSQL] before you run your application in production mode.
+Complete the integration testing of your application in JVM and native modes by using link:{quarkusio-guides}/dev-services#databases[Dev Services for PostgreSQL] before you run your application in production mode.
 
 Start by adding the following dependencies to your test project:
 
-[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
-.pom.xml
+* Using Maven:
++
+--
+[source,xml]
 ----
 <dependency>
     <groupId>io.rest-assured</groupId>
@@ -395,12 +409,16 @@ Start by adding the following dependencies to your test project:
     <scope>test</scope>
 </dependency>
 ----
-
-[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
-.build.gradle
+--
++
+* Using Gradle:
++
+--
+[source,gradle]
 ----
 testImplementation("io.rest-assured:rest-assured")
 ----
+--
 
 * To run your application in dev mode:
 
@@ -495,7 +513,7 @@ As you can see in this code sample, you do not need to start the test container 
 [NOTE]
 ====
 When you start your application in dev mode, Dev Services for PostgreSQL launches a PostgreSQL dev mode container so that you can start developing your application.
-While developing your application, you can add and run tests individually by using the xref:continuous-testing.adoc[Continuous Testing] feature.
+While developing your application, you can add and run tests individually by using the link:{quarkusio-guides}/continuous-testing[Continuous Testing] feature.
 Dev Services for PostgreSQL supports testing while you develop by providing a separate PostgreSQL test container that does not conflict with the dev mode container.
 ====
 
@@ -634,21 +652,21 @@ user
 == What's next
 
 You have successfully learned how to create and test a secure Quarkus application.
-This was achieved by integrating the built-in xref:security-basic-authentication.adoc[Basic authentication] in Quarkus with the Jakarta Persistence identity provider.
+This was achieved by integrating the built-in link:{default-url}/basic-authentication/security-basic-authentication[Basic authentication] in Quarkus with the Jakarta Persistence identity provider.
 
 After completing this tutorial, you can explore more advanced security mechanisms in Quarkus.
 The following information shows you how to use `OpenID Connect` for secure single sign-on access to your Quarkus endpoints:
 
-* xref:security-oidc-bearer-token-authentication.adoc[OIDC Bearer token authentication]
-* xref:security-oidc-code-flow-authentication.adoc[OIDC code flow mechanism for protecting web applications]
+* link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OIDC Bearer token authentication]
+* link:{default-url}/openid-connect-authentication/security-oidc-code-flow-authentication[OIDC code flow mechanism for protecting web applications]
 
 == References
 
-* xref:security-overview.adoc[Quarkus Security overview]
-* xref:security-architecture.adoc[Quarkus Security architecture]
-* xref:security-authentication-mechanisms.adoc#other-supported-authentication-mechanisms[Other supported authentication mechanisms]
-* xref:security-identity-providers.adoc[Identity providers]
-* xref:security-oidc-bearer-token-authentication.adoc[OIDC Bearer token authentication]
-* xref:security-oidc-code-flow-authentication.adoc[OIDC code flow mechanism for protecting web applications]
-* xref:hibernate-orm-panache.adoc[Simplified Hibernate ORM with Panache]
-* xref:hibernate-orm.adoc[Using Hibernate ORM and Jakarta Persistence]
+* link:{default-url}/security-overview/security-overview[Quarkus Security overview]
+* link:{default-url}/security-architecture/security-architecture[Quarkus Security architecture]
+* link:{default-url}/security-architecture/security-authentication-mechanisms#other-supported-authentication-mechanisms[Other supported authentication mechanisms]
+* link:{default-url}/security-architecture/security-identity-providers[Identity providers]
+* link:{default-url}/openid-connect-authentication/security-oidc-bearer-token-authentication[OIDC Bearer token authentication]
+* link:{default-url}/openid-connect-authentication/security-oidc-code-flow-authentication[OIDC code flow mechanism for protecting web applications]
+* link:{quarkusio-guides}/hibernate-orm-panache[Simplified Hibernate ORM with Panache]
+* link:{quarkusio-guides}/hibernate-orm[Using Hibernate ORM and Jakarta Persistence]
