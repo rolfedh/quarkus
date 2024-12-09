@@ -1,35 +1,61 @@
 ////
-This guide is maintained in the main Quarkus repository
-and pull requests should be submitted there:
+This guide is maintained in the main Quarkus repository.
+To contribute, submit a pull request here:
 https://github.com/quarkusio/quarkus/tree/main/docs/src/main/asciidoc
 ////
 = Using OpenID Connect (OIDC) and Keycloak to centralize authorization
 include::_attributes.adoc[]
 :diataxis-type: howto
 :categories: security
-:keywords: sso oidc security keycloak
-:topics: security,authentication,authorization,keycloak,sso,oidc
-:extensions: io.quarkus:quarkus-oidc,io.quarkus:quarkus-keycloak-authorization
+:keywords: sso, oidc, security, keycloak
+:topics: security, authentication, authorization, keycloak, sso, oidc
+:extensions: io.quarkus:quarkus-oidc, io.quarkus:quarkus-keycloak-authorization
 
-Learn how to enable bearer token authorization in your Quarkus application using link:https://www.keycloak.org/docs/latest/authorization_services/index.html[Keycloak Authorization Services] for secure access to protected resources.
+Learn how to enable bearer token authorization in your Quarkus application by using link:https://www.keycloak.org/docs/latest/authorization_services/index.html[Keycloak Authorization Services] for secure access to protected resources.
 
-The `quarkus-keycloak-authorization` extension relies on `quarkus-oidc`.
-It introduces a policy enforcer that regulates access to secured resources.
-Permissions defined in Keycloak govern access, offering flexible and dynamic Resource-Based Access Control (RBAC).
+.Overview
 
-Currently, this extension is compatible solely with Quarkus xref:security-oidc-bearer-token-authentication.adoc[OIDC service applications].
+The `quarkus-keycloak-authorization` extension builds on the `quarkus-oidc` extension to offer advanced authorization capabilities. It includes a policy enforcer that dynamically regulates access to secured resources. Access is governed by permissions defined in Keycloak, supporting flexible and dynamic Resource-Based Access Control (RBAC).
 
-Instead of relying on explicit mechanisms like role-based access control (RBAC), `quarkus-keycloak-authorization` determines request permissions dynamically based on resource attributes such as name, identifier, or Uniform Resource Identifier (URI). This is achieved by sending a `quarkus-oidc`-verified bearer access token to Keycloak Authorization Services, which evaluates the token and makes an authorization decision.
+Use this extension if:
+- You are using Keycloak.
+- Keycloak Authorization Services is enabled in your environment to handle authorization decisions.
 
-Use `quarkus-keycloak-authorization` only if you are using Keycloak and have enabled Keycloak Authorization Services to handle authorization decisions.
-Otherwise, use `quarkus-oidc` instead.
+For other cases, consider using the simpler `quarkus-oidc` extension instead.
 
-By shifting authorization responsibilities outside your application, you enhance security through diverse access control methods and reduce the need for frequent redeployments as security requirements evolve. Keycloak serves as a centralized authorization hub, efficiently managing protected resources and their corresponding permissions.
+.How it works
 
-For more information, see the xref:security-oidc-bearer-token-authentication.adoc[OIDC Bearer Token Authentication] guide.
-The Bearer Token authentication mechanism performs authentication and creates a security identity. The `quarkus-keycloak-authorization` extension then applies a Keycloak authorization policy to this identity based on the current request path and other policy settings.
+The `quarkus-keycloak-authorization` extension centralizes authorization responsibilities in Keycloak, enhancing security and simplifying application maintenance. The extension:
+1. Uses the `quarkus-oidc` extension to verify bearer tokens.
+2. Sends verified tokens to Keycloak Authorization Services.
+3. Allows Keycloak to evaluate resource-based permissions dynamically, using attributes such as resource name, identifier, or URI.
 
-For more information, see https://www.keycloak.org/docs/latest/authorization_services/index.html#_enforcer_overview[Keycloak Authorization Services documentation].
+By externalizing authorization decisions, you can:
+- Implement diverse access control strategies without modifying application code.
+- Reduce redeployment needs as security requirements evolve.
+
+.Compatibility
+
+This extension is compatible only with Quarkus xref:security-oidc-bearer-token-authentication.adoc[OIDC service applications]. It replaces explicit mechanisms such as role-based access control with dynamic authorization policies.
+
+.Key Features
+
+- **Centralized Management**: Delegate authorization decisions to Keycloak for consistent security policies across applications.
+- **Dynamic Permissions**: Define access control dynamically by using resource attributes.
+- **Simplified Maintenance**: Reduce the need to update and redeploy applications when access policies change.
+
+.Setting Up
+
+Before using this extension, ensure the following:
+1. Keycloak Authorization Services is enabled in your Keycloak instance.
+2. Your Quarkus application includes the `quarkus-keycloak-authorization` extension.
+
+For detailed steps, see the xref:security-oidc-bearer-token-authentication.adoc[OIDC Bearer Token Authentication] guide.
+
+.Additional resources
+
+To learn more about Keycloak Authorization Services and the policy enforcer, visit the official documentation:
+https://www.keycloak.org/docs/latest/authorization_services/index.html#_enforcer_overview[Keycloak Authorization Services Documentation].
 
 == Prerequisites
 
@@ -38,30 +64,54 @@ include::{includes}/prerequisites.adoc[]
 * https://stedolan.github.io/jq/[jq tool]
 * https://www.keycloak.org[Keycloak]
 
+Here's the improved and optimized version of the section with a focus on clarity, structure, and adherence to best practices:
 == Architecture
 
-In this example, we build a very simple microservice that offers two endpoints:
+This example demonstrates a simple microservice setup with two protected endpoints:
 
 * `/api/users/me`
 * `/api/admin`
 
-These endpoints are protected.
-Access is granted only when a client sends a bearer token with the request.
-This token must be valid, having a correct signature, expiration date, and audience.
-Additionally, the microservice must trust the token.
+.Token-based access control
 
-The bearer token is issued by a Keycloak server and represents the subject for which the token was issued.
-For being an OAuth 2.0 Authorization Server, the token also references the client acting on behalf of the user.
+Access to these endpoints is controlled using bearer tokens. To gain access, the following conditions must be met:
 
-The `/api/users/me` endpoint can be accessed by any user with a valid token.
-As a response, it returns a JSON document with details about the user obtained from the information carried on the token.
-This endpoint is protected with RBAC, and only users granted with the `user` role can access this endpoint.
+- **Valid token**: The token must have a correct signature, a valid expiration date, and the appropriate audience.
+- **Trust**: The microservice must trust the issuing Keycloak server.
 
-The `/api/admin` endpoint is protected with RBAC, and only users granted the `admin` role can access it.
+The bearer tokens issued by the Keycloak server serve as:
+- **User identifiers**: Indicating the subject (user) for whom the token was issued.
+- **Client references**: Identifying the client application acting on behalf of the user, per OAuth 2.0 Authorization Server standards.
 
-This is a very simple example of using RBAC policies to govern access to your resources.
-However, Keycloak supports other policies that you can use to perform even more fine-grained access control.
-By using this example, you'll see that your application is completely decoupled from your authorization policies, with enforcement purely based on the accessed resource.
+.Endpoints and access policies
+
+`/api/users/me`
+
+- **Access policy**: Open to users with a valid bearer token and the `user` role.
+- **Response**: Returns user details as a JSON object derived from the token.
+
+Example response:
+[source,json]
+----
+{
+  "user": {
+    "id": "1234",
+    "username": "johndoe",
+    "email": "johndoe@example.com"
+  }
+}
+----
+
+`/api/admin`
+
+- *Access policy*: Restricted to users with a valid bearer token and the `admin` role.
+
+.Decoupled authorization
+
+This example highlights the use of Role-Based Access Control (RBAC) policies to protect resources. Key points include:
+
+- *Policy flexibility*: Keycloak supports various policy types, such as attribute-based and custom policies, enabling fine-grained control.
+- *Decoupled application logic*: Authorization policies are managed entirely by Keycloak, allowing your application to focus on its core functionality.
 
 == Solution
 
@@ -82,7 +132,7 @@ Create a new project with the following command:
 include::{includes}/devtools/create-app.adoc[]
 
 This command generates a project, importing the `keycloak-authorization` extension.
-This extension implements a Keycloak Adapter for Quarkus applications and provides all the necessary capabilities to integrate with a Keycloak server and perform bearer token authorization.
+This extension implements a Keycloak Adapter for Quarkus applications and offers all the necessary capabilities to integrate with a Keycloak server and perform bearer token authorization.
 
 If you already have your Quarkus project configured, you can add the `oidc` and `keycloak-authorization` extensions
 to your project by running the following command in your project base directory:
