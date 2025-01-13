@@ -398,14 +398,15 @@ quarkus.keycloak.devservices.resource-mappings.policies=/opt/keycloak/providers/
 
 == Running the application in JVM mode
 
-After exploring the application in dev mode, you can run it as a standard Java application.
+After exploring the application in dev mode, you can run it as a standard Java application in JVM mode.
 
-First compile it:
 
+. Compile the application:
++
 include::{includes}/devtools/build.adoc[]
 
-Then run it:
-
+. Run the application in JVM mode:
++
 [source,bash]
 ----
 java -jar target/quarkus-app/quarkus-run.jar
@@ -413,16 +414,18 @@ java -jar target/quarkus-app/quarkus-run.jar
 
 == Running the application in native mode
 
-This same demo can be compiled into native code; no modifications are required.
+You can compile this demo into native code; no modifications are required.
 
-This implies that you no longer need to install a JVM on your production environment because the runtime technology is included in the produced binary and optimized to run with minimal resources.
+Native compilation eliminates the need for a JVM in the production environment because the produced binary includes the runtime and is optimized for minimal resource usage.
 
-Compilation takes a bit longer, so this step is turned off by default; let's build again by enabling the `native` profile:
+Compilation takes longer and is disabled by default. To build the application, enable the `native` profile.
 
+. Build the native binary:
++
 include::{includes}/devtools/build-native.adoc[]
 
-After a while, you can run this binary directly:
-
+. After a while, run the native binary:
++
 [source,bash]
 ----
 ./target/security-keycloak-authorization-quickstart-runner
@@ -431,11 +434,13 @@ After a while, you can run this binary directly:
 [[testing]]
 == Testing the application
 
-See the preceding <<keycloak-dev-mode,Running the application in Dev mode>> section about testing your application in a dev mode.
+Refer to the <<keycloak-dev-mode,Running the application in Dev mode>> section for instructions on testing your application in development mode.
 
-You can test the application launched in JVM or native modes with `curl`.
+You can test the application running in JVM or native modes by using `curl`.
 
-The application uses bearer token authorization, and the first thing to do is obtain an access token from the Keycloak server to access the application resources:
+.Obtaining an access token
+
+The application uses bearer token authorization. To access its resources, first obtain an access token from the Keycloak server:
 
 [source,bash]
 ----
@@ -449,12 +454,12 @@ export access_token=$(\
 
 [NOTE]
 ====
-When the `quarkus.oidc.authentication.user-info-required` property is set to `true` to require that an access token is used to request `UserInfo`, you must add a `scope=openid` query parameter to the token grant request command, for example:
+If the `quarkus.oidc.authentication.user-info-required` property is set to `true`, the application requires that an access token is used to request `UserInfo`. In that case, you must add the `scope=openid` query parameter to the token grant request; for example:
 
 [source,bash]
 ----
 export access_token=$(\
-    curl --insecure -X POST http://localhost:8180/realms/quarkus/protocol/openid-connect/token \
+    curl --insecure -X POST https://localhost:8543/realms/quarkus/protocol/openid-connect/token \
     --user backend-service:secret \
     -H 'content-type: application/x-www-form-urlencoded' \
     -d 'username=alice&password=alice&grant_type=password&scope=openid' | jq --raw-output '.access_token' \
@@ -462,11 +467,11 @@ export access_token=$(\
 ----
 ====
 
-The preceding example obtains an access token for user `alice`.
+The preceding example obtains an access token for the user `alice`.
 
-Any user is allowed to access the
-`http://localhost:8080/api/users/me` endpoint,
-which returns a JSON payload with details about the user.
+.Accessing the `/api/users/me` endpoint
+
+Any user with a valid access token can access the `http://localhost:8080/api/users/me` endpoint, which returns a JSON payload with user details:
 
 [source,bash]
 ----
@@ -475,17 +480,20 @@ curl -v -X GET \
   -H "Authorization: Bearer "$access_token
 ----
 
-The `http://localhost:8080/api/admin` endpoint can only be accessed by users with the `admin` role.
-If you try to access this endpoint with the previously issued access token, you get a `403` response from the server.
+.Accessing the `/api/admin` endpoint
+
+The `http://localhost:8080/api/admin` endpoint is restricted to users with the `admin` role. If you try to access this endpoint with the previously issued access token, the server returns a `403 Forbidden` response:
 
 [source,bash]
 ----
- curl -v -X GET \
-   http://localhost:8080/api/admin \
-   -H "Authorization: Bearer "$access_token
+curl -v -X GET \
+  http://localhost:8080/api/admin \
+  -H "Authorization: Bearer "$access_token
 ----
 
-To access the admin endpoint, get a token for the `admin` user:
+.Getting an admin access token
+
+To access the admin endpoint, get an access token for the `admin` user:
 
 [source,bash]
 ----
@@ -499,8 +507,7 @@ export access_token=$(\
 
 == Injecting the authorization client
 
-In some cases, using the link:https://www.keycloak.org/docs/latest/authorization_services/#_service_client_api[Keycloak Authorization Client Java API] is beneficial for tasks such as managing resources and obtaining permissions directly from Keycloak.
-For this purpose, you can inject an `AuthzClient` instance into your beans as follows:
+You can use the link:https://www.keycloak.org/docs/latest/authorization_services/#_service_client_api[Keycloak Authorization Client Java API] for advanced tasks, such as managing resources and getting permissions directly from Keycloak. To enable this functionality, inject an `AuthzClient` instance into your beans:
 
 [source,java]
 ----
@@ -511,6 +518,11 @@ public class ProtectedResource {
 ----
 
 NOTE: If you want to use the `AuthzClient` directly, set `quarkus.keycloak.policy-enforcer.enable=true`; otherwise, no bean is available for injection.
+
+[NOTE]
+====
+To use the `AuthzClient` directly, set `quarkus.keycloak.policy-enforcer.enable=true`. Otherwise, no bean is available for injection.
+====
 
 == Mapping protected resources
 
