@@ -1627,11 +1627,23 @@ public User userPrivate() {
 When the result the `userPublic` method is serialized, the `id` field will not be contained in the response as the `Public` view does not include it.
 The result of `userPrivate` however will include the `id` as expected when serialized.
 
-===== Reflection-free Jackson serialization
+===== Reflection-free Jackson serialization and deserialization
 
-Out-of-the-box Jackson serialization converts objects into their JSON representation by introspecting them through a heavy use of reflection. However, the general Quarkus philosophy is to avoid reflection as much as possible, often replacing it with build time code generation. For this reason it is possible to automatically generate at build time implementations of the Jackson `StdSerializer`, one for each class to be converted in JSON. These generated serializers can be subsequently used by Quarkus at runtime to perform the JSON serialization of the objects returned by a REST endpoint without any use of reflection.
+By default, Jackson uses reflection to convert objects to and from JSON.
+However, {project-name} follows a build-time optimization philosophy.
+To align with this approach, configure your application to minimize reflection by using the link:https://quarkus.io/extensions/io.quarkus/quarkus-rest-jackson[`quarkus-rest-jackson`] extension.
+This configuration improves performance, reduces memory overhead, and enhances efficiency in native applications.
 
-This feature is turned off by default, but it can be enabled by setting the configuration property `quarkus.rest.jackson.optimization.enable-reflection-free-serializers=true`.
+This feature is available as a Technology Preview and is disabled by default.
+To enable it, set the following configuration property:
+
+[source,properties]
+----
+quarkus.rest.jackson.optimization.enable-reflection-free-serializers=true
+----
+
+When enabled, {project-name} generates `StdSerializer` implementations at build time for each class that requires JSON conversion.
+The application then uses these generated serializers to serialize and deserialize objects returned by REST endpoints without relying on reflection.
 
 ===== Completely customized per method serialization/deserialization
 
