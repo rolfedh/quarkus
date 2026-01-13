@@ -3416,6 +3416,28 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>inject-extension-status</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipDocs}</skip>
+                            <!-- Don't wait for unkillable reference reaper threads -->
+                            <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                            <mainClass>io.quarkus.docs.generation.ExtensionStatusInjector</mainClass>
+                            <arguments>
+                                <!-- Path to extensions directory -->
+                                <argument>${project.basedir}/../extensions</argument>
+                                <!-- Path to copied AsciiDoc sources -->
+                                <argument>${project.basedir}/target/asciidoc/sources</argument>
+                            </arguments>
+                            <environmentVariables>
+                                <MAVEN_CMD_LINE_ARGS>${env.MAVEN_CMD_LINE_ARGS}</MAVEN_CMD_LINE_ARGS>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>generate-doc-manifests</id>
                         <phase>package</phase>
                         <goals>
