@@ -1,0 +1,187 @@
+////
+This guide is maintained in the main Quarkus repository
+and pull requests should be submitted there:
+https://github.com/quarkusio/quarkus/tree/main/docs/src/main/asciidoc
+////
+= Aesh extension reference
+include::_attributes.adoc[]
+:categories: command-line
+:diataxis-type: reference
+:summary: Configuration properties, validation rules, and API reference for the Quarkus Aesh extension.
+:topics: command-line,cli,aesh,ssh,websocket,terminal
+:extensions: io.quarkus:quarkus-aesh,io.quarkus:quarkus-aesh-websocket,io.quarkus:quarkus-aesh-ssh
+
+This document provides technical reference for the Quarkus Aesh extension.
+For a guided introduction, see the xref:aesh-tutorial.adoc[Getting started with Aesh] tutorial.
+For step-by-step instructions, see the xref:aesh-howto.adoc[Aesh how-to guide].
+For background concepts and architecture, see xref:aesh-concept.adoc[About the Aesh extension].
+
+== Mode auto-detection rules
+
+The extension selects console or runtime mode based on your command annotations.
+You can override auto-detection with `quarkus.aesh.mode`.
+
+[cols="2,1,2"]
+|===
+|Condition |Selected mode |Rationale
+
+|Single `@CommandDefinition` (no group)
+|Runtime
+|One command implies single-execution CLI
+
+|Single `@GroupCommandDefinition`
+|Runtime
+|Group with subcommands implies standard CLI (e.g., `git`)
+
+|Multiple `@CommandDefinition` classes without a `@GroupCommandDefinition`
+|Console
+|Multiple top-level commands need an interactive shell to select between them
+
+|Any class annotated with `@CliCommand`
+|Console
+|`@CliCommand` explicitly requests console mode
+
+|Remote transport present (WebSocket or SSH)
+|Console
+|Remote terminals require a persistent session
+|===
+
+== Build-time validation
+
+The Aesh extension validates command configurations at build time.
+Invalid configurations are reported as deployment failures with descriptive error messages.
+
+* **Duplicate top-level command names** -- two or more top-level command classes with the same `@CommandDefinition(name = "...")` value.
+* **Missing `@CommandDefinition` on group sub-commands** -- a class listed in `@GroupCommandDefinition(groupCommands = {...})` that is not annotated with `@CommandDefinition`.
+* **Multiple `@TopCommand` annotations** -- more than one class annotated with `@TopCommand`, but only one entry point is allowed in runtime mode.
+* **Conflicting `@TopCommand` and `@CliCommand`** -- both annotations on the same class. `@TopCommand` designates a runtime-mode entry point while `@CliCommand` designates a console-mode command; these are mutually exclusive.
+
+== SSH configuration properties
+
+[source,properties]
+----
+# SSH server port (default: 2222)
+quarkus.aesh.ssh.port=2222
+
+# SSH server bind address (default: localhost)
+quarkus.aesh.ssh.host=localhost
+
+# Password for SSH authentication (default: any password accepted)
+quarkus.aesh.ssh.password=mysecret
+
+# Path to an OpenSSH authorized_keys file for public key authentication
+quarkus.aesh.ssh.authorized-keys-file=/path/to/authorized_keys
+
+# Path to the host key file (default: hostkey.ser)
+quarkus.aesh.ssh.host-key-file=hostkey.ser
+
+# Enable or disable the SSH server (default: true)
+quarkus.aesh.ssh.enabled=true
+----
+
+Password and public key authentication can be used simultaneously.
+When both are configured, clients can authenticate with either method.
+If neither is configured, any password is accepted.
+
+== Connection management properties
+
+Both SSH and WebSocket transports support limiting concurrent sessions and closing idle connections.
+
+[source,properties]
+----
+# Maximum concurrent SSH sessions (default: no limit)
+quarkus.aesh.ssh.max-connections=10
+
+# Close idle SSH sessions after a duration (default: disabled)
+quarkus.aesh.ssh.idle-timeout=30m
+
+# Maximum concurrent WebSocket sessions (default: no limit)
+quarkus.aesh.websocket.max-connections=10
+
+# Close idle WebSocket sessions after a duration (default: disabled)
+quarkus.aesh.websocket.idle-timeout=30m
+----
+
+When `max-connections` is set, new connections beyond the limit are rejected immediately.
+When `idle-timeout` is set, sessions with no input activity for the specified duration are closed automatically.
+
+== `AeshSessionEvent` API
+
+The extension fires CDI events when remote sessions open and close.
+Events are fired asynchronously for both SSH and WebSocket sessions.
+
+The `AeshSessionEvent` payload provides:
+
+* `sessionId()` -- unique identifier for the session
+* `transport()` -- `"ssh"` or `"websocket"`
+* `timestamp()` -- when the event occurred
+
+== Health checks
+
+When the `quarkus-smallrye-health` extension is present, readiness health checks are automatically registered for SSH and WebSocket transports.
+The health endpoints report whether each transport is running and the number of active connections.
+
+To disable the health checks:
+
+[source,properties]
+----
+quarkus.aesh.ssh.health.enabled=false
+quarkus.aesh.websocket.health.enabled=false
+----
+
+== Local console behavior
+
+When a remote transport extension is present, the local console (stdin/stdout) is not started by default.
+
+[source,properties]
+----
+# Force start the local console alongside remote transports
+quarkus.aesh.start-console=true
+
+# Disable the local console even without remote transports
+# (useful when embedding commands in a server application)
+quarkus.aesh.start-console=false
+----
+
+[cols="2,1"]
+|===
+|Condition |Local console
+
+|No remote transport present
+|Starts (default)
+
+|Remote transport present
+|Skipped (server mode)
+
+|`quarkus.aesh.start-console` explicitly set
+|Follows explicit setting
+|===
+
+== Dev UI pages
+
+The Aesh extension provides Dev UI pages at `http://localhost:8080/q/dev-ui` when running in development mode.
+
+[cols="1,1,3"]
+|===
+|Page |Available when |Description
+
+|Commands
+|Always
+|Table of all discovered CLI commands with name, description, type (`@TopCommand`, `@CliCommand`, or Group), class name, and sub-commands. Shows the resolved execution mode. Includes a search field.
+
+|Sessions
+|Remote transport extension present
+|Transport cards showing status, active session count, and maximum session limit. Live event log of session open/close events.
+
+|Terminal
+|`quarkus-aesh-websocket` extension present
+|Interactive terminal using https://xtermjs.org/[xterm.js]. Click **Connect** to open a WebSocket session. Supports color, resize, and unicode.
+|===
+
+== Configuration Reference
+
+include::{generated-dir}/config/quarkus-aesh.adoc[opts=optional, leveloffset=+1]
+
+include::{generated-dir}/config/quarkus-aesh-websocket.adoc[opts=optional, leveloffset=+1]
+
+include::{generated-dir}/config/quarkus-aesh-ssh.adoc[opts=optional, leveloffset=+1]
