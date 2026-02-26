@@ -1,0 +1,309 @@
+////
+This guide is maintained in the main Quarkus repository
+and pull requests should be submitted there:
+https://github.com/quarkusio/quarkus/tree/main/docs/src/main/asciidoc
+////
+= Build your first CLI application with Aesh
+include::_attributes.adoc[]
+:categories: command-line
+:subcategories: aesh
+:diataxis-type: tutorial
+:nav-title: Build your first Aesh CLI app
+:summary: Build an interactive CLI application with multiple commands, tab completion, and shared state using the Quarkus Aesh extension.
+:topics: command-line,cli,aesh
+:extensions: io.quarkus:quarkus-aesh
+
+In this tutorial, you will build an interactive command line application with two commands that share state through CDI.
+By the end, you will have a working task manager that runs as an interactive shell with tab completion, command history, and persistent state across commands.
+
+== Prerequisites
+
+include::{includes}/prerequisites.adoc[]
+
+== What you'll learn
+
+* How to create a Quarkus CLI application with the Aesh extension
+* How to define commands with options and arguments using Aesh annotations
+* How console mode provides an interactive shell with multiple commands
+* How `@ApplicationScoped` services retain state across commands in a session
+* How to package the application as an executable jar
+
+== Creating the project
+
+Create a new project with the Aesh extension:
+
+:create-app-artifact-id: aesh-quickstart
+:create-app-extensions: aesh
+include::{includes}/devtools/create-app.adoc[]
+
+This generates an empty Quarkus project with the `quarkus-aesh` extension.
+
+== Writing your first command
+
+Create the file `src/main/java/org/acme/aesh/GreetCommand.java`:
+
+[source,java]
+----
+package org.acme.aesh;
+
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandResult;
+import org.aesh.command.invocation.CommandInvocation;
+import org.aesh.command.option.Option;
+
+@CommandDefinition(name = "greet", description = "Greet someone")
+public class GreetCommand implements Command<CommandInvocation> {
+
+    @Option(shortName = 'n', name = "name", defaultValue = "World")
+    private String name;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        invocation.println("Hello " + name + "!");
+        return CommandResult.SUCCESS;
+    }
+}
+----
+
+Every Aesh command implements `Command<CommandInvocation>` and is annotated with `@CommandDefinition`.
+The `@Option` annotation declares a named option that users pass on the command line.
+
+Run the application in dev mode:
+
+include::{includes}/devtools/dev.adoc[]
+
+You will see the Quarkus banner followed by a prompt:
+
+[source,shell]
+----
+[quarkus]$ _
+----
+
+This is the Aesh interactive shell. Type `greet` and press Enter:
+
+[source,shell]
+----
+[quarkus]$ greet
+Hello World!
+----
+
+Now try it with a name:
+
+[source,shell]
+----
+[quarkus]$ greet --name=Quarkus
+Hello Quarkus!
+----
+
+Notice that tab completion works -- type `gr` and press Tab to auto-complete the command name.
+Type `exit` to leave the shell.
+
+== Adding a second command
+
+With one command, the application runs in runtime mode (execute and exit).
+When you add a second command, the extension automatically switches to console mode, providing the interactive shell.
+
+Create the file `src/main/java/org/acme/aesh/CalcCommand.java`:
+
+[source,java]
+----
+package org.acme.aesh;
+
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandResult;
+import org.aesh.command.invocation.CommandInvocation;
+import org.aesh.command.option.Option;
+
+@CommandDefinition(name = "calc", description = "Add two numbers")
+public class CalcCommand implements Command<CommandInvocation> {
+
+    @Option(shortName = 'a', name = "a", defaultValue = "0")
+    private int a;
+
+    @Option(shortName = 'b', name = "b", defaultValue = "0")
+    private int b;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        invocation.println("Result: " + (a + b));
+        return CommandResult.SUCCESS;
+    }
+}
+----
+
+Press the spacebar in your dev mode terminal to restart the application.
+You will see the `[quarkus]$` prompt again.
+Now both commands are available:
+
+[source,shell]
+----
+[quarkus]$ greet --name=Aesh
+Hello Aesh!
+[quarkus]$ calc -a 5 -b 3
+Result: 8
+[quarkus]$ exit
+----
+
+Notice that the shell stays open between commands -- you can type as many commands as you want before exiting.
+Tab completion works for both command names and option names.
+
+== Adding shared state with CDI
+
+The interactive shell keeps the application running across command invocations.
+This means `@ApplicationScoped` beans retain their state throughout the session -- a key advantage of console mode.
+
+Create a task service that stores tasks in memory.
+Create the file `src/main/java/org/acme/aesh/TaskService.java`:
+
+[source,java]
+----
+package org.acme.aesh;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class TaskService {
+
+    private final List<String> tasks = new ArrayList<>();
+
+    public void addTask(String task) {
+        tasks.add(task);
+    }
+
+    public List<String> getTasks() {
+        return Collections.unmodifiableList(tasks);
+    }
+}
+----
+
+Now create two commands that use this service.
+Create the file `src/main/java/org/acme/aesh/AddTaskCommand.java`:
+
+[source,java]
+----
+package org.acme.aesh;
+
+import jakarta.inject.Inject;
+
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandResult;
+import org.aesh.command.invocation.CommandInvocation;
+import org.aesh.command.option.Argument;
+
+@CommandDefinition(name = "add", description = "Add a task")
+public class AddTaskCommand implements Command<CommandInvocation> {
+
+    @Argument(description = "Task name", required = true)
+    private String name;
+
+    @Inject
+    TaskService taskService;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        taskService.addTask(name);
+        invocation.println("Added: " + name);
+        return CommandResult.SUCCESS;
+    }
+}
+----
+
+Create the file `src/main/java/org/acme/aesh/ListTasksCommand.java`:
+
+[source,java]
+----
+package org.acme.aesh;
+
+import jakarta.inject.Inject;
+
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandResult;
+import org.aesh.command.invocation.CommandInvocation;
+
+@CommandDefinition(name = "list", description = "List all tasks")
+public class ListTasksCommand implements Command<CommandInvocation> {
+
+    @Inject
+    TaskService taskService;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        if (taskService.getTasks().isEmpty()) {
+            invocation.println("No tasks yet.");
+        } else {
+            taskService.getTasks().forEach(t -> invocation.println("  - " + t));
+        }
+        return CommandResult.SUCCESS;
+    }
+}
+----
+
+Press the spacebar to restart.
+Now try adding tasks and listing them:
+
+[source,shell]
+----
+[quarkus]$ add groceries
+Added: groceries
+[quarkus]$ add laundry
+Added: laundry
+[quarkus]$ list
+  - groceries
+  - laundry
+[quarkus]$ exit
+----
+
+Notice that `list` shows both tasks -- the `TaskService` kept its state across the `add` and `list` command invocations because it is `@ApplicationScoped`.
+This is a key advantage of console mode: each command runs in the same application instance, so beans can accumulate and share state throughout the session.
+
+== Packaging the application
+
+Build an uber-jar so you can distribute the application as a single file:
+
+[source,shell]
+----
+mvn package -Dquarkus.package.jar.type=uber-jar
+----
+
+Run it:
+
+[source,shell]
+----
+java -jar target/aesh-quickstart-runner.jar
+----
+
+You will see the same `[quarkus]$` prompt.
+Your interactive CLI application is now a self-contained jar that runs anywhere Java is installed.
+
+You can also build a native executable for faster startup:
+
+[source,shell]
+----
+mvn package -Dnative
+./target/aesh-quickstart-runner
+----
+
+== Summary
+
+You have built an interactive CLI application with four commands that share state through CDI injection.
+Along the way, you experienced:
+
+* Defining commands with `@CommandDefinition`, options with `@Option`, and arguments with `@Argument`
+* Console mode's interactive shell with tab completion and command history
+* How the Aesh extension auto-detects console mode when multiple commands are present
+* How `@ApplicationScoped` beans retain state across commands within a session
+* Packaging as an uber-jar and as a native executable
+
+== Next steps
+
+* xref:aesh-howto.adoc[Build CLI applications with Aesh] -- group commands with subcommands, add custom completers and validators, set up remote terminals via WebSocket and SSH, and more
+* xref:aesh-concept.adoc[Understand the Aesh extension] -- understand execution modes, CDI scope rules, and the remote access architecture
+* xref:aesh-reference.adoc[Aesh extension reference] -- configuration properties, build-time validation rules, and API reference
