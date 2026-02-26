@@ -51,6 +51,9 @@ categories:
 
   - category: command-line
     cat-title: Command Line Applications
+    subcategories:
+      - subcategory: aesh
+        subcat-title: Build interactive CLIs with Aesh
 
   - category: integration
     cat-title: Integration

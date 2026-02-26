@@ -1,0 +1,88 @@
+////
+This guide is maintained in the main Quarkus repository
+and pull requests should be submitted there:
+https://github.com/quarkusio/quarkus/tree/main/docs/src/main/asciidoc
+////
+= Understand the Aesh extension
+include::_attributes.adoc[]
+:categories: command-line
+:subcategories: aesh
+:diataxis-type: concept
+:summary: Understand the architecture and design decisions behind the Quarkus Aesh extension.
+:topics: command-line,cli,aesh,ssh,websocket,terminal
+:extensions: io.quarkus:quarkus-aesh,io.quarkus:quarkus-aesh-websocket,io.quarkus:quarkus-aesh-ssh
+
+This document explains the key concepts and design decisions behind the Quarkus Aesh extension.
+For a guided introduction, see the xref:aesh-tutorial.adoc[Build your first CLI application with Aesh] tutorial.
+For step-by-step instructions, see the xref:aesh-howto.adoc[Build CLI applications with Aesh].
+For configuration properties and API details, see the xref:aesh-reference.adoc[Aesh extension reference].
+
+== What is Aesh?
+
+https://github.com/aeshell/aesh[Aesh] is a Java library for building interactive command line applications.
+It supports option parsing, tab completion, command grouping, and an interactive shell (REPL) mode.
+For more details about the Aesh library itself, see the https://aeshell.github.io/[Aesh documentation].
+
+The Quarkus Aesh extension integrates Aesh into the Quarkus build and runtime lifecycle.
+With it, you can build CLI applications that benefit from Quarkus features like CDI injection, build-time optimization, and native compilation.
+
+== Execution modes: console vs. runtime
+
+The Aesh extension supports two execution modes, controlled by the `quarkus.aesh.mode` build-time property.
+Understanding when to use each mode is important for choosing the right architecture.
+
+=== Console mode (interactive shell)
+
+Console mode is what makes Aesh distinctive compared to other CLI frameworks.
+It starts an interactive shell (REPL) where users can type multiple commands with tab completion, command history, and -- crucially -- shared state across commands.
+
+Because the application stays running across multiple command invocations, `@ApplicationScoped` beans retain their state throughout the session.
+For example, a task management app can accumulate tasks in memory as the user adds them one by one -- something that is not possible in runtime mode, where each invocation is a separate process.
+
+Console mode also supports sub-command mode: when a user types a group command without a sub-command, they enter an interactive context for that group, where they can type sub-commands directly without the parent prefix.
+
+=== Runtime mode (single command execution)
+
+Runtime mode executes a single command and exits, similar to standard CLI tools like `git` or `curl`.
+This is the natural choice when your application performs one operation per invocation.
+
+=== How mode auto-detection works
+
+In most cases, you do not need to set `quarkus.aesh.mode` explicitly.
+The extension infers the appropriate mode from your command annotations:
+
+- **Console mode** is selected when there are multiple `@CommandDefinition` classes without a `@GroupCommandDefinition`, when any class is annotated with `@CliCommand`, or when a remote transport (WebSocket or SSH) is present.
+- **Runtime mode** is selected when there is a single `@CommandDefinition` or a `@GroupCommandDefinition`.
+
+You can override auto-detection by setting `quarkus.aesh.mode=console` or `quarkus.aesh.mode=runtime` explicitly.
+
+[id="cdi-and-command-scope"]
+== CDI and command scope
+
+All command classes are registered as CDI beans by the Aesh extension.
+You can use `@Inject` to inject other beans into your commands.
+
+However, beans annotated with `@CommandDefinition` should not use proxied scopes (e.g., do not use `@ApplicationScoped` on a command class).
+Aesh sets option field values directly via reflection, which conflicts with CDI proxy objects.
+By default, the Aesh extension registers command classes with the `@Dependent` scope.
+
+Services injected _into_ commands can use any scope.
+`@ApplicationScoped` services are particularly useful in console mode because they retain state across multiple command invocations within the same session.
+
+== Remote access architecture
+
+The Aesh extension provides optional sub-extensions for remote terminal access via WebSocket and SSH.
+With these, users can interact with your CLI application from a browser or an SSH client while the application runs as a server.
+
+This architecture is useful when you want to embed an administrative CLI into a running server application, or when you need remote access to a CLI application running in a container or on a headless machine.
+
+=== Local console behavior with remote transports
+
+When a remote transport extension (`quarkus-aesh-websocket` or `quarkus-aesh-ssh`) is present, the local console (stdin/stdout) is not started by default.
+This prevents the local console from blocking the terminal when the application is intended to run as a server with remote CLI access.
+
+The auto-detection logic:
+
+* No remote transport present -> local console **starts** (default CLI application behavior)
+* Remote transport present -> local console **skipped** (server mode with remote CLI access)
+* `quarkus.aesh.start-console` explicitly set -> overrides auto-detection in either direction

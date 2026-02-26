@@ -1,0 +1,618 @@
+////
+This guide is maintained in the main Quarkus repository
+and pull requests should be submitted there:
+https://github.com/quarkusio/quarkus/tree/main/docs/src/main/asciidoc
+////
+= Build CLI applications with Aesh
+include::_attributes.adoc[]
+:categories: command-line
+:subcategories: aesh
+:diataxis-type: howto
+:summary: Develop command line applications with the Aesh extension.
+:topics: command-line,cli,aesh,ssh,websocket,terminal
+:extensions: io.quarkus:quarkus-aesh,io.quarkus:quarkus-aesh-websocket,io.quarkus:quarkus-aesh-ssh
+
+This guide shows how to build interactive and single-command CLI applications using the Aesh extension.
+For a guided introduction, see the xref:aesh-tutorial.adoc[Build your first CLI application with Aesh] tutorial.
+For background on execution modes and architecture, see xref:aesh-concept.adoc[Understand the Aesh extension].
+For configuration properties and API details, see the xref:aesh-reference.adoc[Aesh extension reference].
+
+IMPORTANT: If you are not familiar with the Quarkus Command Mode, consider reading the xref:command-mode-reference.adoc[Command Mode reference guide] first.
+
+== Extension
+
+Once you have your Quarkus project configured you can add the `aesh` extension
+to your project by running the following command in your project base directory.
+
+:add-extension-extensions: aesh
+include::{includes}/devtools/extension-add.adoc[]
+
+This will add the following to your build file:
+
+[source,xml,role="primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven"]
+.pom.xml
+----
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-aesh</artifactId>
+</dependency>
+----
+
+[source,gradle,role="secondary asciidoc-tabs-target-sync-gradle"]
+.build.gradle
+----
+implementation("io.quarkus:quarkus-aesh")
+----
+
+== Build a console-mode application
+
+To build a console-mode application with multiple interactive commands, annotate each command class with `@CommandDefinition` and `@CliCommand`:
+
+[source,java]
+----
+package com.acme.aesh;
+
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandResult;
+import org.aesh.command.invocation.CommandInvocation;
+import org.aesh.command.option.Option;
+
+import io.quarkus.aesh.runtime.annotations.CliCommand;
+
+@CommandDefinition(name = "greet", description = "Greet someone")
+@CliCommand // <1>
+public class GreetCommand implements Command<CommandInvocation> {
+
+    @Option(shortName = 'n', name = "name", defaultValue = "World")
+    private String name;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        invocation.println("Hello " + name + "!");
+        return CommandResult.SUCCESS;
+    }
+}
+
+@CommandDefinition(name = "calc", description = "Add two numbers")
+@CliCommand
+class CalcCommand implements Command<CommandInvocation> {
+
+    @Option(shortName = 'a', name = "a", defaultValue = "0")
+    private int a;
+
+    @Option(shortName = 'b', name = "b", defaultValue = "0")
+    private int b;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        invocation.println("Result: " + (a + b));
+        return CommandResult.SUCCESS;
+    }
+}
+----
+<1> `@CliCommand` explicitly marks a command for console mode. When auto-detection is used, `@CliCommand` is automatically added to `@CommandDefinition` classes that are not sub-commands of a group.
+
+TIP: With two commands, console mode is auto-detected. See xref:aesh-reference.adoc#mode-auto-detection-rules[Mode auto-detection rules] for the full set of rules.
+
+[source,shell]
+----
+$ java -jar myapp.jar
+[quarkus]$ greet --name=Aesh
+Hello Aesh!
+[quarkus]$ calc -a 5 -b 3
+Result: 8
+[quarkus]$ exit
+----
+
+The prompt, exit command, and other console settings are configurable via `quarkus.aesh.*` properties.
+
+=== Group commands in console mode (sub-command mode)
+
+You can use `@GroupCommandDefinition` with `@CliCommand` in console mode to create command groups with sub-command mode.
+When a user types a group command without a sub-command, they enter an interactive context for that group:
+
+[source,java]
+----
+package com.acme.aesh;
+
+import jakarta.inject.Inject;
+
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandResult;
+import org.aesh.command.GroupCommandDefinition;
+import org.aesh.command.invocation.CommandInvocation;
+import org.aesh.command.option.Argument;
+
+import io.quarkus.aesh.runtime.annotations.CliCommand;
+
+@GroupCommandDefinition(name = "task", description = "Task management",
+        groupCommands = {AddTask.class, ListTasks.class}) // <1>
+@CliCommand
+public class TaskGroup implements Command<CommandInvocation> {
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        invocation.println("Sub-commands: add, list");
+        return CommandResult.SUCCESS;
+    }
+}
+
+@CommandDefinition(name = "add", description = "Add a task") // <2>
+class AddTask implements Command<CommandInvocation> {
+
+    @Argument(description = "Task name", required = true)
+    private String name;
+
+    @Inject // <3>
+    TaskService taskService;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        taskService.addTask(name);
+        invocation.println("Added: " + name);
+        return CommandResult.SUCCESS;
+    }
+}
+
+@CommandDefinition(name = "list", description = "List tasks")
+class ListTasks implements Command<CommandInvocation> {
+
+    @Inject
+    TaskService taskService;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        taskService.getTasks().forEach(t -> invocation.println("  - " + t));
+        return CommandResult.SUCCESS;
+    }
+}
+----
+<1> Sub-commands listed in `groupCommands` are only accessible through their parent group -- they do not appear as top-level commands in the shell.
+<2> Sub-commands use `@CommandDefinition` without `@CliCommand`. The extension automatically excludes them from top-level registration.
+<3> CDI injection works in sub-commands. The extension injects `@Inject` fields after Aesh creates the sub-command instances.
+
+An interactive session using sub-command mode:
+
+[source,shell]
+----
+$ java -jar myapp.jar
+[quarkus]$ task add groceries          # <1>
+Added: groceries
+[quarkus]$ task                        # <2>
+task> add laundry                      # <3>
+Added: laundry
+task> list
+  - groceries
+  - laundry
+task> exit                             # <4>
+[quarkus]$ exit
+----
+<1> Sub-commands can be called directly with their parent prefix.
+<2> Typing just the group command name enters sub-command mode.
+<3> Inside sub-command mode, type sub-commands directly without the parent prefix.
+<4> Type `exit` (or `..`) to leave sub-command mode and return to the main prompt.
+
+== Build a runtime-mode application
+
+=== Single command application
+
+To create a runtime-mode application with a single command, annotate your class with `@CommandDefinition`:
+
+[source,java]
+----
+package com.acme.aesh;
+
+import jakarta.inject.Inject;
+
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandResult;
+import org.aesh.command.invocation.CommandInvocation;
+import org.aesh.command.option.Option;
+
+@CommandDefinition(name = "hello", description = "Greet someone") // <1>
+public class HelloCommand implements Command<CommandInvocation> {
+
+    @Option(shortName = 'n', name = "name", description = "Who to greet", defaultValue = "World")
+    private String name;
+
+    @Inject // <2>
+    GreetingService greetingService;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        invocation.println(greetingService.greet(name));
+        return CommandResult.SUCCESS;
+    }
+}
+----
+<1> If there is only one class annotated with `@CommandDefinition`, it is automatically used as the entry point of the command line application.
+<2> All command classes are registered as CDI beans. You can use `@Inject` to inject other beans.
+
+[source,java]
+----
+package com.acme.aesh;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+class GreetingService {
+    String greet(String name) {
+        return "Hello " + name + "!";
+    }
+}
+----
+
+IMPORTANT: Do not use proxied scopes (e.g., `@ApplicationScoped`) on `@CommandDefinition` classes.
+See xref:aesh-concept.adoc#cdi-and-command-scope[CDI and command scope] for the rationale.
+
+=== Grouped commands with subcommands
+
+When you have a parent command with subcommands, use `@GroupCommandDefinition` and `@TopCommand`:
+
+[source,java]
+----
+package com.acme.aesh;
+
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandResult;
+import org.aesh.command.GroupCommandDefinition;
+import org.aesh.command.invocation.CommandInvocation;
+import org.aesh.command.option.Argument;
+import org.aesh.command.option.Option;
+import org.aesh.command.option.ParentCommand;
+
+import io.quarkus.aesh.runtime.annotations.TopCommand;
+
+@GroupCommandDefinition(name = "cli", description = "CLI application",
+        groupCommands = {RunCommand.class, InfoCommand.class}) // <1>
+@TopCommand // <2>
+public class CliCommand implements Command<CommandInvocation> {
+
+    @Option(shortName = 'v', name = "verbose", hasValue = false)
+    private boolean verbose;
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        invocation.println("Use a subcommand: run, info");
+        return CommandResult.SUCCESS;
+    }
+}
+
+@CommandDefinition(name = "run", description = "Run a task")
+class RunCommand implements Command<CommandInvocation> {
+
+    @ParentCommand // <3>
+    private CliCommand parent;
+
+    @Argument(description = "Task name")
+    private String taskName;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        if (parent.isVerbose()) {
+            invocation.println("[VERBOSE] Running...");
+        }
+        invocation.println("Running task: " + taskName);
+        return CommandResult.SUCCESS;
+    }
+}
+
+@CommandDefinition(name = "info", description = "Show info")
+class InfoCommand implements Command<CommandInvocation> {
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        invocation.println("CLI App v1.0");
+        return CommandResult.SUCCESS;
+    }
+}
+----
+<1> `@GroupCommandDefinition` lists the subcommands available under this parent command.
+<2> `@TopCommand` marks this as the entry point. This is required when there are multiple command classes.
+<3> `@ParentCommand` injects the parent command, giving access to parent options like `--verbose`.
+
+The application can then be invoked as:
+
+[source,shell]
+----
+$ java -jar myapp.jar run build
+Running task: build
+
+$ java -jar myapp.jar info
+CLI App v1.0
+----
+
+== Add custom option completers, converters, and validators
+
+With the Aesh extension, you can implement custom tab-completion, type conversion, and option validation as CDI beans:
+
+[source,java]
+----
+package com.acme.aesh;
+
+import java.util.List;
+
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandResult;
+import org.aesh.command.completer.CompleterInvocation;
+import org.aesh.command.completer.OptionCompleter;
+import org.aesh.command.invocation.CommandInvocation;
+import org.aesh.command.option.Option;
+import org.aesh.command.validator.OptionValidator;
+import org.aesh.command.validator.OptionValidatorException;
+import org.aesh.command.validator.ValidatorInvocation;
+
+@CommandDefinition(name = "deploy", description = "Deploy to an environment")
+public class DeployCommand implements Command<CommandInvocation> {
+
+    @Option(name = "env", completer = EnvCompleter.class, validator = EnvValidator.class) // <1>
+    private String environment;
+
+    @Override
+    public CommandResult execute(CommandInvocation invocation) {
+        invocation.println("Deploying to " + environment);
+        return CommandResult.SUCCESS;
+    }
+}
+
+@Dependent // <2>
+class EnvCompleter implements OptionCompleter<CompleterInvocation> {
+
+    @Inject // <3>
+    EnvironmentService envService;
+
+    @Override
+    public void complete(CompleterInvocation completerInvocation) {
+        String input = completerInvocation.getGivenCompleteValue();
+        for (String env : envService.getAvailableEnvironments()) {
+            if (input == null || input.isEmpty() || env.startsWith(input)) {
+                completerInvocation.addCompleterValue(env);
+            }
+        }
+    }
+}
+
+@Dependent
+class EnvValidator implements OptionValidator<ValidatorInvocation<String, ?>> {
+    private static final List<String> VALID = List.of("dev", "staging", "prod");
+
+    @Override
+    public void validate(ValidatorInvocation<String, ?> validatorInvocation) throws OptionValidatorException {
+        if (!VALID.contains(validatorInvocation.getValue())) {
+            throw new OptionValidatorException("Invalid environment. Valid values: " + VALID);
+        }
+    }
+}
+----
+<1> Reference custom completers, validators, and converters via their class in annotation attributes.
+<2> CDI beans implementing aesh interfaces (`OptionCompleter`, `OptionValidator`, `Converter`, `CommandActivator`, etc.) are automatically kept by Arc even though they are only referenced from annotations.
+<3> Completers can inject CDI services. This is particularly useful in console mode, where a completer can offer context-aware suggestions based on application state (e.g., completing task names from a service).
+
+== Customize CLI settings
+
+You can customize the underlying Aesh `SettingsBuilder` by implementing the `CliSettings` interface:
+
+[source,java]
+----
+package com.acme.aesh;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import org.aesh.command.settings.SettingsBuilder;
+
+import io.quarkus.aesh.runtime.CliSettings;
+
+@ApplicationScoped
+public class MyCliSettings implements CliSettings {
+
+    @Override
+    public void customize(SettingsBuilder<?, ?, ?, ?, ?, ?> builder) {
+        builder.enableAlias(true)
+                .persistHistory(true)
+                .historySize(1000);
+    }
+}
+----
+
+Multiple `CliSettings` beans can be registered. They are applied in arbitrary order, so avoid conflicting settings across implementations.
+
+== Set up a WebSocket terminal
+
+Add the `quarkus-aesh-websocket` dependency to expose a browser-based terminal:
+
+[source,xml]
+----
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-aesh-websocket</artifactId>
+</dependency>
+----
+
+Once added, the terminal is accessible at `http://localhost:8080/aesh/index.html` when the application is running.
+The WebSocket endpoint is registered at `/aesh/terminal` by default. You can change the endpoint path:
+
+[source,properties]
+----
+quarkus.aesh.websocket.path=/custom/terminal
+----
+
+NOTE: The built-in HTML page connects to the default path. When using a custom path, access the page with a `path` query parameter: `http://localhost:8080/aesh/index.html?path=/custom/terminal`.
+
+To disable the WebSocket endpoint:
+
+[source,properties]
+----
+quarkus.aesh.websocket.enabled=false
+----
+
+=== Secure the WebSocket terminal
+
+The WebSocket terminal endpoint has no authentication by default. You can secure it by
+requiring an authenticated user or restricting access to specific roles. Both options
+require a Quarkus Security extension to be present (e.g., `quarkus-elytron-security-properties-file`).
+
+To require any authenticated user:
+
+[source,properties]
+----
+quarkus.aesh.websocket.authenticated=true
+----
+
+To restrict access to specific roles:
+
+[source,properties]
+----
+quarkus.aesh.websocket.roles-allowed=admin,operator
+----
+
+When `roles-allowed` is set, `authenticated` is ignored since role-based access implies authentication.
+
+NOTE: The extension will log a warning at build time if the WebSocket terminal is enabled
+in production without authentication configured.
+
+== Set up an SSH terminal
+
+Add the `quarkus-aesh-ssh` dependency to expose an SSH server:
+
+[source,xml]
+----
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-aesh-ssh</artifactId>
+</dependency>
+----
+
+Connect to the terminal with any SSH client:
+
+[source,shell]
+----
+ssh -p 2222 localhost
+----
+
+For the full list of SSH configuration properties, see the xref:aesh-reference.adoc#ssh-configuration-properties[SSH configuration properties reference].
+
+NOTE: The extension will log a warning at startup if the SSH server is running without
+any authentication configured (no password, no authorized-keys-file).
+
+== Observe session events
+
+The extension fires CDI events when remote sessions open and close. Use these to monitor session lifecycle, log access, or perform cleanup:
+
+[source,java]
+----
+package com.acme.aesh;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.ObservesAsync;
+
+import io.quarkus.aesh.runtime.AeshSessionEvent;
+import io.quarkus.aesh.runtime.SessionClosed;
+import io.quarkus.aesh.runtime.SessionOpened;
+
+@ApplicationScoped
+public class SessionLogger {
+
+    void onOpen(@ObservesAsync @SessionOpened AeshSessionEvent event) { // <1>
+        System.out.println("Session opened: " + event.sessionId()
+                + " via " + event.transport());
+    }
+
+    void onClose(@ObservesAsync @SessionClosed AeshSessionEvent event) {
+        System.out.println("Session closed: " + event.sessionId()
+                + " at " + event.timestamp());
+    }
+}
+----
+<1> Events are fired asynchronously. Use `@ObservesAsync` (not `@Observes`) to receive them.
+
+For the full `AeshSessionEvent` API, see the xref:aesh-reference.adoc#aeshsessionevent-api[AeshSessionEvent API reference].
+
+== Secure remote terminals
+
+WARNING: The WebSocket and SSH terminals provide remote access to your application's CLI.
+In production, always configure authentication:
+
+* **SSH**: Set `quarkus.aesh.ssh.password` for password auth, or `quarkus.aesh.ssh.authorized-keys-file`
+  for public key auth (or both). Without either, any password is accepted.
+* **WebSocket**: Set `quarkus.aesh.websocket.authenticated=true` or `quarkus.aesh.websocket.roles-allowed`
+  to require authentication. This requires a Quarkus Security extension.
+
+Additionally, restrict network access to these endpoints using firewalls or bind addresses.
+Use `idle-timeout` to automatically close abandoned sessions and `max-connections` to limit concurrent sessions and prevent resource exhaustion.
+
+== Provide your own QuarkusMain
+
+You can provide your own application entry point annotated with `@QuarkusMain` (as described in xref:command-mode-reference.adoc[Command Mode reference guide]).
+When a `@QuarkusMain` is present, the Aesh extension will not register its own runner.
+
+[source,java]
+----
+package com.acme.aesh;
+
+import jakarta.inject.Inject;
+
+import org.aesh.AeshRuntimeRunner;
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandResult;
+import org.aesh.command.invocation.CommandInvocation;
+
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
+
+@QuarkusMain
+public class CustomMain implements QuarkusApplication {
+
+    @Inject
+    AeshRuntimeRunner runner;
+
+    @Override
+    public int run(String... args) throws Exception {
+        runner.args(args).execute();
+        return 0;
+    }
+}
+----
+
+== Run in development mode
+
+In development mode (`mvn quarkus:dev`), the application is executed and restarted every time the `Space bar` key is pressed. You can also pass arguments to your command line app via the `quarkus.args` system property, e.g. `mvn quarkus:dev -Dquarkus.args='--help'` and `mvn quarkus:dev -Dquarkus.args='-n Quarkus'`.
+For Gradle projects, arguments can be passed using `--quarkus-args`.
+
+== Package your application
+
+An Aesh command line application is a standard Quarkus application and can be packaged as a JAR or a native executable.
+
+=== As a jar
+
+Building an uber-jar is practical if you plan on distributing the JAR directly:
+
+[source,shell]
+----
+mvn package -Dquarkus.package.jar.type=uber-jar
+java -jar target/myapp-runner.jar --name=World
+----
+
+=== As a native executable
+
+You can build a https://quarkus.io/guides/building-native-image[native executable] for faster startup and lower memory usage:
+
+[source,shell]
+----
+mvn package -Dnative
+./target/myapp-runner --name=World
+----
+
+The Aesh extension automatically registers command classes and their option types for reflection in native builds.
